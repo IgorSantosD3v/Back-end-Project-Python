@@ -1,0 +1,20 @@
+[project]
+name = "BackendProject"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "Igor",email = "okallizn@gmail.com"}
+]
+requires-python = ">=3.14"
+dependencies = [
+    "fastapi[standard] (>=0.128.7,<0.129.0)"
+]
+
+
+[tool.poetry]
+package-mode = false
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
