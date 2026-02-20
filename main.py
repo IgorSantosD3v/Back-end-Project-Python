@@ -63,7 +63,7 @@ def post_livros(id_livro: int, livro: Livro):
         )
     else:
         # Se não existir, cria o livro no dicionário
-        meu_livrozinhos[id_livro] = Livro.dict()
+        meu_livrozinhos[id_livro] = livro.model_dump()
         # Retorna mensagem de sucesso
         return {"message":"O livro foi criado com sucesso!"}
 
@@ -84,7 +84,7 @@ def put_livros(id_livro: int, livro: Livro):
             detail="Esse livro não foi encontrado!"
         )
     else:
-        meu_livro[id_livro] = livro.dict()
+        meu_livrozinhos[id_livro] = livro.model_dump()
         # Atualiza os campos do livro
         # (aqui você está modificando o dicionário existente)
         return {
