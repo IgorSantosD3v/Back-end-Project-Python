@@ -10,6 +10,9 @@
 # Delete  -> DELETE
 
 from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
+from typing import Optional
+
 # FastAPI: framework para criar APIs
 # HTTPException: usado para retornar erros HTTP personalizados (404, 400, etc.)
 
@@ -21,6 +24,10 @@ app = FastAPI()
 # O valor será outro dicionário com os dados do livro
 meu_livrozinhos = {}
 
+class Livro(BaseModel):
+    nome_livro: str
+    autor_livro: str
+    ano_livro: int
 # -------------------------------
 # Rota raiz (teste)
 # -------------------------------
@@ -46,12 +53,7 @@ def get_livros():
 # POST - Adicionar livro (CREATE)
 # -------------------------------
 @app.post("/adiciona")
-def post_livros(
-    id_livro: int,
-    nome_livro: str,
-    autor_livro: str,
-    ano_livro: int
-):
+def post_livros(id_livro: int, livro: Livro):
     # Verifica se o id do livro já existe no "banco"
     if id_livro in meu_livrozinhos:
         # Se existir, lança erro 400 (requisição inválida)
@@ -61,25 +63,17 @@ def post_livros(
         )
     else:
         # Se não existir, cria o livro no dicionário
-        meu_livrozinhos[id_livro] = {
-            "nome_livro": nome_livro,
-            "autor_livro": autor_livro,
-            "ano_livro": ano_livro
-        }
-
+        meu_livrozinhos[id_livro] = Livro.dict()
         # Retorna mensagem de sucesso
-        return {"message": "O livro foi criado com sucesso!"}
+        return {"message":"O livro foi criado com sucesso!"}
+
+             
 
 # -------------------------------
 # PUT - Atualizar livro (UPDATE)
 # -------------------------------
 @app.put("/atualiza/{id_livro}")
-def put_livros(
-    id_livro: int,
-    nome_livro: str,
-    autor_livro: str,
-    ano_livro: int
-):
+def put_livros(id_livro: int, livro: Livro):
     # Busca o livro pelo id
     meu_livro = meu_livrozinhos.get(id_livro)
 
@@ -90,18 +84,9 @@ def put_livros(
             detail="Esse livro não foi encontrado!"
         )
     else:
+        meu_livro[id_livro] = livro.dict()
         # Atualiza os campos do livro
         # (aqui você está modificando o dicionário existente)
-
-        if nome_livro:
-            meu_livro["nome_livro"] = nome_livro
-
-        if autor_livro:
-            meu_livro["autor_livro"] = autor_livro
-
-        if ano_livro:
-            meu_livro["ano_livro"] = ano_livro
-
         return {
             "message": "As informações do seu livro foram atualizadas com sucesso!"
         }
