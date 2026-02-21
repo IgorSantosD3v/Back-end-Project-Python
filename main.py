@@ -8,6 +8,7 @@
 # Read    -> GET
 # Update  -> PUT
 # Delete  -> DELETE
+# Documentação Swagger/ Serve para compartilhar nossos endpoints atraves da nossa API, como por exemplo, Outra equipe tecnica.
 
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
@@ -16,7 +17,9 @@ from typing import Optional
 # FastAPI: framework para criar APIs
 # HTTPException: usado para retornar erros HTTP personalizados (404, 400, etc.)
 
-app = FastAPI()
+app = FastAPI(
+    title="API de Livros"
+)
 # Cria a aplicação FastAPI
 
 # Dicionário que funciona como "banco de dados em memória"
