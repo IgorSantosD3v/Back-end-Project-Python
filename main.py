@@ -10,9 +10,10 @@
 # Delete  -> DELETE
 # Documentação Swagger/ Serve para compartilhar nossos endpoints atraves da nossa API, como por exemplo, Outra equipe tecnica.
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, Depends, HTTPException
+from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from pydantic import BaseModel
-from typing import Optional
+import secrets
 
 # FastAPI: framework para criar APIs
 # HTTPException: usado para retornar erros HTTP personalizados (404, 400, etc.)
@@ -20,6 +21,13 @@ from typing import Optional
 app = FastAPI(
     title="API de Livros"
 )
+
+MEU_USUARIO = "admin"
+MINHA_SENHA = "admin"
+
+security = HTTPBasic()
+
+meu_livrozinhos = {}
 # Cria a aplicação FastAPI
 
 # Dicionário que funciona como "banco de dados em memória"
@@ -34,6 +42,19 @@ class Livro(BaseModel):
 # -------------------------------
 # Rota raiz (teste)
 # -------------------------------
+def autenticar_meu_usuario(credentials: HTTPBasicCredentials = Depends(security)):
+    is_username_correct = secrets.compare_digest(credentials.username, MEU_USUARIO)
+    is_password_correct = secrets.compare_digest(credentials.password, MINHA_SENHA)
+    
+    if not (is_username_correct and is_password_correct):
+        raise HTTPException(
+            status_code=401,
+            detail="Usuário ou senha incorretos",
+            headers={"WWW-Authenticate": "Basic"}
+        )
+
+
+
 @app.get("/")
 def hello_world():
     # Endpoint simples só para testar se a API está rodando
@@ -43,7 +64,7 @@ def hello_world():
 # GET - Listar livros (READ)
 # -------------------------------
 @app.get("/livros")
-def get_livros():
+def get_livros(credentials: HTTPBasicCredentials = Depends(autenticar_meu_usuario)):
     # Verifica se o dicionário está vazio
     if not meu_livrozinhos:
         # Se não existir nenhum livro cadastrado
@@ -56,7 +77,7 @@ def get_livros():
 # POST - Adicionar livro (CREATE)
 # -------------------------------
 @app.post("/adiciona")
-def post_livros(id_livro: int, livro: Livro):
+def post_livros (id_livro: int, livro: Livro, credentials: HTTPBasicCredentials = Depends(autenticar_meu_usuario)):
     # Verifica se o id do livro já existe no "banco"
     if id_livro in meu_livrozinhos:
         # Se existir, lança erro 400 (requisição inválida)
@@ -76,7 +97,7 @@ def post_livros(id_livro: int, livro: Livro):
 # PUT - Atualizar livro (UPDATE)
 # -------------------------------
 @app.put("/atualiza/{id_livro}")
-def put_livros(id_livro: int, livro: Livro):
+def put_livros(id_livro: int, livro: Livro, credentials: HTTPBasicCredentials = Depends(autenticar_meu_usuario)):
     # Busca o livro pelo id
     meu_livro = meu_livrozinhos.get(id_livro)
 
@@ -98,7 +119,7 @@ def put_livros(id_livro: int, livro: Livro):
 # DELETE - Remover livro (DELETE)
 # -------------------------------
 @app.delete("/deletar/{id_livro}")
-def delete_livro(id_livro: int):
+def delete_livro(id_livro: int, credentials: HTTPBasicCredentials = Depends(autenticar_meu_usuario)):
     # Verifica se o livro existe
     if id_livro not in meu_livrozinhos:
         raise HTTPException(
