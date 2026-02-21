@@ -64,18 +64,32 @@ def hello_world():
 # GET - Listar livros (READ)
 # -------------------------------
 @app.get("/livros")
-def get_livros(credentials: HTTPBasicCredentials = Depends(autenticar_meu_usuario)):
-    # Verifica se o dicionário está vazio
-    if not meu_livrozinhos:
-        # Se não existir nenhum livro cadastrado
-        return {"message": "Não existe nenhum livro!"}
-    else:
-        # Retorna todos os livros cadastrados
-        return {"livros": meu_livrozinhos}
+def get_livros(page: int = 1, limit: int = 10, credentials: HTTPBasicCredentials = Depends(autenticar_meu_usuario)):
+  if page < 1 or limit < 1:
+      raise HTTPException(status_code=400, detail="Page ou limit estão com valores inválidos!")
 
+  if not meu_livrozinhos:
+      return {"message": "Não existe nenhum livro!"}
+  
+  start = (page - 1) * limit
+  end = start + limit
+      
+  
+  livros_paginados = [
+      {"id": id_livro, "nome_livro": livro_data["nome_livro"], "autor_livro": livro_data["autor_livro"], "ano_livro": livro_data["ano_livro"]}
+      for id_livro, livro_data in list(meu_livrozinhos.items())[start:end]
+  ]
+  
+  return{
+      "page": page,
+      "limit": limit,
+      "total": len(meu_livrozinhos),
+      "livros": livros_paginados
+  }
 # -------------------------------
 # POST - Adicionar livro (CREATE)
 # -------------------------------
+
 @app.post("/adiciona")
 def post_livros (id_livro: int, livro: Livro, credentials: HTTPBasicCredentials = Depends(autenticar_meu_usuario)):
     # Verifica se o id do livro já existe no "banco"
