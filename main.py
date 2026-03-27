@@ -15,6 +15,17 @@ from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from pydantic import BaseModel
 import secrets
 
+from sqlalchemy import create_engine, Column, Integer, String
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
+
+DATABASE_URL = "sqlite:///./livros.db"
+
+engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+Base = declarative_base()
+
+
 # FastAPI: framework para criar APIs
 # HTTPException: usado para retornar erros HTTP personalizados (404, 400, etc.)
 
@@ -35,10 +46,13 @@ meu_livrozinhos = {}
 # O valor será outro dicionário com os dados do livro
 meu_livrozinhos = {}
 
-class Livro(BaseModel):
-    nome_livro: str
-    autor_livro: str
-    ano_livro: int
+class Livro(Base):
+    __tablename__ = "livros"
+    id = Column(Integer, primary_key=True, index=True)
+    nome_livro = Column(String, index=True)
+    autor_livro = Column(String, index=True)
+    ano_livro = Column(Integer, index=True)
+   
 # -------------------------------
 # Rota raiz (teste)
 # -------------------------------

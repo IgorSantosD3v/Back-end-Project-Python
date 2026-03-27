@@ -7,7 +7,9 @@ authors = [
 ]
 requires-python = ">=3.14"
 dependencies = [
-    "fastapi[standard] (>=0.128.7,<0.129.0)"
+    "fastapi[standard] (>=0.128.7,<0.129.0)",
+    "sqlalchemy (>=2.0.48,<3.0.0)",
+    "aiosqlite (>=0.22.1,<0.23.0)"
 ]
 
 
