@@ -46,13 +46,29 @@ meu_livrozinhos = {}
 # O valor será outro dicionário com os dados do livro
 meu_livrozinhos = {}
 
-class Livro(Base):
+class LivroDB(Base):
     __tablename__ = "livros"
     id = Column(Integer, primary_key=True, index=True)
     nome_livro = Column(String, index=True)
     autor_livro = Column(String, index=True)
     ano_livro = Column(Integer, index=True)
-   
+
+
+
+class Livro(BaseModel):
+    nome_livro: str
+    autor_livro: str
+    ano_livro: int
+    
+Base.metadata.create_all(bind=engine)
+
+def sessao_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+        
 # -------------------------------
 # Rota raiz (teste)
 # -------------------------------
