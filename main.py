@@ -17,7 +17,7 @@ import secrets
 
 from sqlalchemy import create_engine, Column, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import Session, sessionmaker
 
 DATABASE_URL = "sqlite:///./livros.db"
 
@@ -84,7 +84,6 @@ def autenticar_meu_usuario(credentials: HTTPBasicCredentials = Depends(security)
         )
 
 
-
 @app.get("/")
 def hello_world():
     # Endpoint simples só para testar se a API está rodando
@@ -94,87 +93,88 @@ def hello_world():
 # GET - Listar livros (READ)
 # -------------------------------
 @app.get("/livros")
-def get_livros(page: int = 1, limit: int = 10, credentials: HTTPBasicCredentials = Depends(autenticar_meu_usuario)):
+def get_livros(page: int = 1, limit: int = 10, db: Session = Depends(sessao_db), credentials: HTTPBasicCredentials = Depends(autenticar_meu_usuario)):
   if page < 1 or limit < 1:
       raise HTTPException(status_code=400, detail="Page ou limit estão com valores inválidos!")
 
-  if not meu_livrozinhos:
+  livros = db.query(LivroDB).offset((page - 1) * limit).limit(limit).all()
+
+  if not livros:
       return {"message": "Não existe nenhum livro!"}
   
-  livros_ordenados = sorted(meu_livrozinhos.items(), key=lambda x: x[0])
-  
-  
-  start = (page - 1) * limit
-  end = start + limit
-      
-  
-  livros_paginados = [
-      {"id": id_livro, "nome_livro": livro_data["nome_livro"], "autor_livro": livro_data["autor_livro"], "ano_livro": livro_data["ano_livro"]}
-      for id_livro, livro_data in livros_ordenados [start:end]
-  ]
+  total_livros = db.query(LivroDB).count()
   
   return{
       "page": page,
       "limit": limit,
-      "total": len(meu_livrozinhos),
-      "livros": livros_paginados
+      "total": total_livros,
+      "livros": [{"id": livro.id, "nome_livro": livro.nome_livro, "autor_livro": livro.autor_livro, "ano_livro": livro.ano_livro} for livro in livros]
   }
 # -------------------------------
 # POST - Adicionar livro (CREATE)
 # -------------------------------
 
 @app.post("/adiciona")
-def post_livros (id_livro: int, livro: Livro, credentials: HTTPBasicCredentials = Depends(autenticar_meu_usuario)):
-    # Verifica se o id do livro já existe no "banco"
-    if id_livro in meu_livrozinhos:
-        # Se existir, lança erro 400 (requisição inválida)
-        raise HTTPException(
-            status_code=400,
-            detail="Esse livro já existe, meu parceiro!"
-        )
-    else:
-        # Se não existir, cria o livro no dicionário
-        meu_livrozinhos[id_livro] = livro.model_dump()
-        # Retorna mensagem de sucesso
-        return {"message":"O livro foi criado com sucesso!"}
-
+def post_livros (livro: Livro, db: Session = Depends(sessao_db), credentials: HTTPBasicCredentials = Depends(autenticar_meu_usuario)):
+    db_livro = db.query(LivroDB).filter(LivroDB.nome_livro == livro.nome_livro, LivroDB.autor_livro == livro.autor_livro).first()
+    if db_livro:
+        raise HTTPException(status_code=400, detail="Esse livro já existe!")
+    
+    novo_livro = LivroDB(nome_livro=livro.nome_livro, autor_livro=livro.autor_livro, ano_livro=livro.ano_livro)
+    db.add(novo_livro)
+    db.commit()
+    db.refresh(novo_livro)
+    return {
+        "message": "Seu livro foi adicionado com sucesso!",
+        "livro": {
+            "id": novo_livro.id,
+            "nome_livro": novo_livro.nome_livro,
+            "autor_livro": novo_livro.autor_livro,
+            "ano_livro": novo_livro.ano_livro
+        }
+    }
              
 
 # -------------------------------
 # PUT - Atualizar livro (UPDATE)
 # -------------------------------
 @app.put("/atualiza/{id_livro}")
-def put_livros(id_livro: int, livro: Livro, credentials: HTTPBasicCredentials = Depends(autenticar_meu_usuario)):
-    # Busca o livro pelo id
-    meu_livro = meu_livrozinhos.get(id_livro)
-
-    # Se não encontrar o livro
-    if not meu_livro:
-        raise HTTPException(
-            status_code=404,
-            detail="Esse livro não foi encontrado!"
-        )
-    else:
-        meu_livrozinhos[id_livro] = livro.model_dump()
-        # Atualiza os campos do livro
-        # (aqui você está modificando o dicionário existente)
-        return {
-            "message": "As informações do seu livro foram atualizadas com sucesso!"
+def put_livros(id_livro: int, livro: Livro, db: Session = Depends(sessao_db), credentials: HTTPBasicCredentials = Depends(autenticar_meu_usuario)):
+    db_livro = db.query(LivroDB).filter(LivroDB.id == id_livro).first()
+    
+    if not db_livro:
+        raise HTTPException(status_code=404, detail="Esse livro não foi encontrado!")
+    
+    db_livro.nome_livro = livro.nome_livro
+    db_livro.autor_livro = livro.autor_livro
+    db_livro.ano_livro = livro.ano_livro
+    
+    db.commit()
+    db.refresh(db_livro)
+    
+    return {
+        "message": "Seu livro foi atualizado com sucesso!",
+        "livro": {
+            "id": db_livro.id,
+            "nome_livro": db_livro.nome_livro,
+            "autor_livro": db_livro.autor_livro,
+            "ano_livro": db_livro.ano_livro
         }
+    }
 
 # -------------------------------
 # DELETE - Remover livro (DELETE)
 # -------------------------------
 @app.delete("/deletar/{id_livro}")
-def delete_livro(id_livro: int, credentials: HTTPBasicCredentials = Depends(autenticar_meu_usuario)):
+def delete_livro(id_livro: int, db: Session = Depends(sessao_db), credentials: HTTPBasicCredentials = Depends(autenticar_meu_usuario)):
     # Verifica se o livro existe
-    if id_livro not in meu_livrozinhos:
+    db_livro = db.query(LivroDB).filter(LivroDB.id == id_livro).first()
+    if not db_livro:
         raise HTTPException(
             status_code=404,
             detail="Esse livro não foi encontrado!"
         )
     else:
-        # Remove o livro do dicionário
-        del meu_livrozinhos[id_livro]
-
+        db.delete(db_livro)
+        db.commit()
         return {"message": "Seu livro foi deletado com sucesso!"}
