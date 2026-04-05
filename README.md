@@ -132,5 +132,5 @@ A tabela `livros` também é criada automaticamente na inicialização, caso nã
 Igor Santos
 Email:
 ```
-`Igorsantosdevp@gmail.com`
+Igorsantosdevp@gmail.com
 ```
