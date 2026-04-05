@@ -129,6 +129,6 @@ A tabela `livros` também é criada automaticamente na inicialização, caso nã
 
 ## Autor
 
-Igor  
+Igor Santos
 Email: `Igorsantosdevp@gmail.com`
 ```
