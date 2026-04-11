@@ -34,13 +34,17 @@ import secrets
 # SQLAlchemy:
 # - create_engine: cria a conexão com o banco
 # - Column, Integer, String: definem colunas e tipos da tabela
-from sqlalchemy import create_engine, Column, Integer, String
-
-# declarative_base cria a classe base para os modelos ORM.
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import create_engine, Integer, String
 
 # Session e sessionmaker gerenciam sessões/conexões com o banco.
-from sqlalchemy.orm import Session, sessionmaker
+# DeclarativeBase / Mapped / mapped_column são o padrão tipado do SQLAlchemy 2.x.
+from sqlalchemy.orm import (
+    DeclarativeBase,
+    Mapped,
+    Session,
+    mapped_column,
+    sessionmaker,
+)
 
 # String de conexão com SQLite.
 # "sqlite:///./livros.db" cria/usa um arquivo "livros.db" na pasta do projeto.
@@ -56,8 +60,9 @@ engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
 # - bind=engine: vincula essa sessão ao engine criado acima
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-# Classe base para nossos modelos ORM.
-Base = declarative_base()
+# Classe base para nossos modelos ORM (SQLAlchemy 2.x).
+class Base(DeclarativeBase):
+    pass
 
 # Cria a aplicação FastAPI e define o título da documentação automática.
 app = FastAPI(title="API de Livros")
@@ -77,13 +82,13 @@ class LivroDB(Base):
     __tablename__ = "livros"
 
     # id: chave primária única de cada livro.
-    id = Column(Integer, primary_key=True, index=True)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
 
     # Demais campos do livro.
     # index=True acelera algumas consultas de busca.
-    nome_livro = Column(String, index=True)
-    autor_livro = Column(String, index=True)
-    ano_livro = Column(Integer, index=True)
+    nome_livro: Mapped[str] = mapped_column(String, index=True)
+    autor_livro: Mapped[str] = mapped_column(String, index=True)
+    ano_livro: Mapped[int] = mapped_column(Integer, index=True)
 
 
 # Modelo de validação da API (corpo da requisição).
