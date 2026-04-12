@@ -19,7 +19,7 @@
 # - Depends: sistema de injeção de dependências
 # - HTTPException: gera erros HTTP padronizados (400, 401, 404 etc.)
 from fastapi import FastAPI, Depends, HTTPException
-
+import os
 # Importa utilitários de autenticação Basic Auth:
 # - HTTPBasic: define o "esquema" de segurança
 # - HTTPBasicCredentials: carrega usuário e senha enviados no request
@@ -48,7 +48,7 @@ from sqlalchemy.orm import (
 
 # String de conexão com SQLite.
 # "sqlite:///./livros.db" cria/usa um arquivo "livros.db" na pasta do projeto.
-DATABASE_URL = "sqlite:///./livros.db"
+DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./livros.db")
 
 # Cria o "engine" (ponte entre Python e banco).
 # check_same_thread=False é comum no SQLite para uso com FastAPI.
@@ -69,8 +69,9 @@ app = FastAPI(title="API de Livros")
 
 # Credenciais fixas para exemplo didático.
 # Em produção, isso deveria vir de variáveis de ambiente ou banco.
-MEU_USUARIO = "admin"
-MINHA_SENHA = "admin"
+# Variavel de ambiente é um recurso do sistema operacional para armazenar dados sensíveis (como senhas) fora do código-fonte.
+MEU_USUARIO = os.getenv("MEU_USUARIO", "admin")
+MINHA_SENHA = os.getenv("MINHA_SENHA", "admin")
 
 # Ativa o esquema HTTP Basic para autenticação.
 security = HTTPBasic()
