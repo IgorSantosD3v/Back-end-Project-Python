@@ -30,7 +30,7 @@ from pydantic import BaseModel
 
 # secrets.compare_digest faz comparação segura de strings (evita timing attacks).
 import secrets
-
+import asyncio
 # SQLAlchemy:
 # - create_engine: cria a conexão com o banco
 # - Column, Integer, String: definem colunas e tipos da tabela
@@ -147,11 +147,38 @@ def hello_world():
     return {"Hello": "World!"}
 
 
-# -------------------------------
+async def chamadas_externas_1():
+   await asyncio.sleep(2)
+   return "Resultado da chamada externa 1"
+
+async def chamadas_externas_2():
+   await asyncio.sleep(3)
+   return "Resultado da chamada externa 2"
+
+async def chamadas_externas_3():
+   await asyncio.sleep(1)
+   return "Resultado da chamada externa 3"
+
+@app.get("/chamadas-externas")
+async def chamadas_externas():
+    tarefa1 = asyncio.create_task(chamadas_externas_1())
+    tarefa2 = asyncio.create_task(chamadas_externas_2())
+    tarefa3 = asyncio.create_task(chamadas_externas_3())
+    
+    resultado1 = await tarefa1
+    resultado2 = await tarefa2
+    resultado3 = await tarefa3
+    
+    return {
+        "mensagem": "Todas as chamadas externas foram concluídas!",
+        "resultados": [resultado1, resultado2, resultado3]
+    }
+
+
 # GET - Listar livros (READ)
 # -------------------------------
 @app.get("/livros")
-def get_livros(
+async def get_livros(
     # Paginação:
     # - page: número da página (começando em 1)
     # - limit: quantidade de itens por página
@@ -201,7 +228,7 @@ def get_livros(
 # POST - Adicionar livro (CREATE)
 # -------------------------------
 @app.post("/adiciona")
-def post_livros(
+async def post_livros(
     # "livro" chega no corpo da requisição e é validado por Pydantic.
     livro: Livro,
     db: Session = Depends(sessao_db),
@@ -248,7 +275,7 @@ def post_livros(
 # PUT - Atualizar livro (UPDATE)
 # -------------------------------
 @app.put("/atualiza/{id_livro}")
-def put_livros(
+async def put_livros(
     # id_livro vem da URL, por isso está entre chaves na rota.
     id_livro: int,
     # "livro" vem no corpo, com os novos dados.
@@ -288,7 +315,7 @@ def put_livros(
 # DELETE - Remover livro (DELETE)
 # -------------------------------
 @app.delete("/deletar/{id_livro}")
-def delete_livro(
+async def delete_livro(
     id_livro: int,
     db: Session = Depends(sessao_db),
     credentials: HTTPBasicCredentials = Depends(autenticar_meu_usuario),
