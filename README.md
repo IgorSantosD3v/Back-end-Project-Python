@@ -19,7 +19,7 @@ O projeto implementa:
 - Poetry
 - Docker e Docker Compose
 
-## Arquitetura da Aplicacao
+## Arquitetura da Aplicação
 
 ### Componentes
 
