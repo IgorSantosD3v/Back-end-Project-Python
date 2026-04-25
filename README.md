@@ -23,11 +23,11 @@ O projeto implementa:
 
 ### Componentes
 
-- `main.py`: aplicacao FastAPI, modelos, rotas, autenticacao e sessao com banco
+- `main.py`: aplicação FastAPI, modelos, rotas, autenticação e sessão com banco
 - `livros.db`: banco SQLite local (arquivo)
 - `Dockerfile`: receita para gerar a imagem da API
 - `docker-compose.yml`: orquestra o container, porta, volume e variaveis de ambiente
-- `.env`: credenciais e configuracao da aplicacao em runtime
+- `.env`: credenciais e configuração da aplicação em runtime
 - `.dockerignore`: evita enviar arquivos desnecessarios para o build
 
 ### Relacao entre `main.py`, imagem Docker e container
@@ -36,7 +36,7 @@ O projeto implementa:
    `uvicorn main:app --host 0.0.0.0 --port 8000`
 2. Isso significa que, dentro do container, o Uvicorn importa `main.py` e executa `app`.
 3. No `docker-compose.yml`, o volume `.:/app` monta o projeto da maquina host dentro do container.
-4. Resultado: o container roda a aplicacao definida em `main.py`, usando seu codigo atual.
+4. Resultado: o container roda a aplicação definida em `main.py`, usando seu codigo atual.
 
 ### Build da imagem (`Dockerfile`)
 
@@ -44,14 +44,14 @@ Etapas principais:
 
 1. Base `python:3.14-slim`
 2. `WORKDIR /app`
-3. Instalacao do Poetry
+3. Instalação do Poetry
 4. Copia `pyproject.toml` e `poetry.lock`
-5. Instalacao das dependencias (`poetry install --no-root`)
+5. Instalação das dependencias (`poetry install --no-root`)
 6. Copia o restante do projeto
-7. Exposicao da porta `8000`
+7. Exposição da porta `8000`
 8. Comando padrao para iniciar a API com Uvicorn
 
-### Execucao com Compose (`docker-compose.yml`)
+### Execução com Compose (`docker-compose.yml`)
 
 - `build: .`: constroi imagem a partir do `Dockerfile`
 - `container_name: livros-api`: nome do container
@@ -70,7 +70,7 @@ Etapas principais:
 Acesso:
 - `http://localhost:8000`
 
-### Fluxo de Requisicao (cliente externo -> container)
+### Fluxo de Requisição (cliente externo -> container)
 
 ```mermaid
 sequenceDiagram
@@ -194,7 +194,7 @@ curl -u admin:admin -X DELETE "http://127.0.0.1:8000/deletar/1"
 └── README.md
 ```
 
-## Documentacao Automatica
+## Documentação Automatica
 
 Com a API rodando:
 - Swagger UI: `http://127.0.0.1:8000/docs`
