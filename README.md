@@ -4,11 +4,11 @@ API REST para gerenciamento de livros com FastAPI, SQLAlchemy e SQLite.
 
 O projeto implementa:
 - CRUD completo de livros
-- autenticacao HTTP Basic nas rotas de livros
+- autenticação HTTP Basic nas rotas de livros
 - paginacao na listagem
 - exemplo de concorrencia assincrona com `asyncio`
-- execucao local com Poetry
-- containerizacao com Docker e Docker Compose
+- execução local com Poetry
+- containerização com Docker e Docker Compose
 
 ## Stack
 
