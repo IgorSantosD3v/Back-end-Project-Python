@@ -107,7 +107,7 @@ Exemplo:
 MEU_USUARIO=admin
 MINHA_SENHA=admin
 DATABASE_URL=sqlite:///./livros.db
-PYTHONNUNBUFFERED=1
+PYTHONUNBUFFERED=1
 ```
 
 ## Endpoints
