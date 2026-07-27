@@ -23,8 +23,12 @@ import os
 # Importa utilitários de autenticação Basic Auth:
 # - HTTPBasic: define o "esquema" de segurança
 # - HTTPBasicCredentials: carrega usuário e senha enviados no request
+import redis
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
-
+from fastapi import BackgroundTasks
+from tasks import somar, fatorial
+from celery_app import celery_app
+from celery.result import AsyncResult
 # BaseModel é usado para definir "modelos de entrada" e validar dados automaticamente.
 from pydantic import BaseModel
 
@@ -64,8 +68,20 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 class Base(DeclarativeBase):
     pass
 
+
+REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
+REDIS_PORT = os.getenv("REDIS_PORT", 6379)
+redis_client = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, db=0, decode_responses=True)
 # Cria a aplicação FastAPI e define o título da documentação automática.
-app = FastAPI(title="API de Livros")
+app = FastAPI(
+    title="API de Livros",
+    description="API para genrenciar catálogo de livros.",
+    version="1.0.0",
+    contact={
+        "name": "Igor Santos",
+        "email": "igorsantosdevp@gmail.com"
+    }
+)
 
 # Credenciais fixas para exemplo didático.
 # Em produção, isso deveria vir de variáveis de ambiente ou banco.
@@ -158,6 +174,43 @@ async def chamadas_externas_2():
 async def chamadas_externas_3():
    await asyncio.sleep(1)
    return "Resultado da chamada externa 3"
+
+
+
+@app.post("/calcular/soma")
+def calcular_soma(a: int, b: int):
+    tarefa = somar.delay(a, b)
+    redis_client.lpush("tarefas_ids", tarefa.id)
+    redis_client.ltrim("tarefas_ids", 0, 49)  # Mantém apenas os últimos 50 IDs
+    return{
+        "task_id": tarefa.id,
+        "message": "A soma está sendo processada em segundo plano. Use o task_id para verificar o status."
+    }
+
+@app.post("/calcular/fatorial")
+def calcular_fatorial(n: int):
+    tarefa = fatorial.delay(n)
+    redis_client.lpush("tarefas_ids", tarefa.id)
+    redis_client.ltrim("tarefas_ids", 0, 49)  # Mantém apenas os últimos 50 IDs
+    return{
+        "task_id": tarefa.id,
+        "message": "O cálculo do fatorial está sendo processado em segundo plano. Use o task_id para verificar o status."
+    }
+
+@app.get("/tarefas/recentes")
+def listar_tarefas_recentes():
+    ids = redis_client.lrange("tarefas_ids", 0, -1)
+    tarefas = []
+    for task_id in ids:
+        resultado = AsyncResult(task_id, app=celery_app)
+        tarefas.append({
+            "task_id": task_id,
+            "status": resultado.status,
+            "result": resultado.result if resultado.status == "SUCCESS" else None
+        })
+    return{"tarefas": tarefas}
+
+
 
 @app.get("/chamadas-externas")
 async def chamadas_externas():

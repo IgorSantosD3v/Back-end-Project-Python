@@ -1,16 +1,31 @@
 
+version: "3.8"
+
 services:
-  app:
-    build: .
-    container_name: livros-api
-    ports:
-        - "8000:8000"
-    volumes:
-        - .:/app
-    env_file:
-        - .env
-    command: ["poetry", "run", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
-    deploy:
-     replicas: 1
-     restart_policy:
-       condition: on-failure
+    app:
+        build: .
+        container_name: livros-api
+        ports:
+            - "8000:8000"
+        volumes:
+            - .:/app
+        env_file:
+            - .env
+        command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+
+    redis:
+        image: docker.io/library/redis:7-alpine
+        container_name: livros-redis
+        ports:
+            - "6379:6379"
+
+    celery:
+        build: .
+        container_name: livros-celery
+        command: ["celery", "-A", "celery_app:celery_app", "worker", "-Q", "livros", "--loglevel=info"]
+        volumes:
+            - .:/app
+        depends_on:
+            - redis
+        env_file:
+            - .env

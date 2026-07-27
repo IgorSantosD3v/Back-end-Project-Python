@@ -6,102 +6,48 @@ O projeto implementa:
 - CRUD completo de livros
 - autenticação HTTP Basic nas rotas de livros
 - paginação na listagem
-- exemplo de concorrencia assincrona com `asyncio`
-- execução local com Poetry
-- containerização com Docker e Docker Compose
+- exemplo de concorrência assíncrona com `asyncio`
+- execução local com `venv` e `requirements.txt`
+- orquestração de container via `podman-compose`/Docker Compose
+- worker Celery usando Redis
 
 ## Stack
 
 - Python `>=3.14`
-- FastAPI (`fastapi[standard]`)
+- FastAPI
 - SQLAlchemy `2.x`
+- Pydantic
+- Celery
+- Redis
 - SQLite
-- Poetry
-- Docker e Docker Compose
+- Podman / Docker
 
-## Arquitetura da Aplicação
+## O que mudou
 
-### Componentes
+O projeto agora usa `requirements.txt` para instalação local e o contêiner é construído com:
+- `Dockerfile` + `requirements.txt`
+- `docker-compose.yml` / `podman-compose.yml` para orquestração
 
-- `main.py`: aplicação FastAPI, modelos, rotas, autenticação e sessão com banco
-- `livros.db`: banco SQLite local (arquivo)
-- `Dockerfile`: receita para gerar a imagem da API
-- `docker-compose.yml`: orquestra o container, porta, volume e variaveis de ambiente
-- `.env`: credenciais e configuração da aplicação em runtime
-- `.dockerignore`: evita enviar arquivos desnecessarios para o build
+A execução local não depende mais de Poetry obrigatoriamente.
 
-### Relacao entre `main.py`, imagem Docker e container
+## Arquivos principais
 
-1. O `Dockerfile` copia o codigo para `/app` e define o comando:
-   `uvicorn main:app --host 0.0.0.0 --port 8000`
-2. Isso significa que, dentro do container, o Uvicorn importa `main.py` e executa `app`.
-3. No `docker-compose.yml`, o volume `.:/app` monta o projeto da maquina host dentro do container.
-4. Resultado: o container roda a aplicação definida em `main.py`, usando seu codigo atual.
+- `main.py`: aplicação FastAPI, modelos, rotas, autenticação e banco
+- `tasks.py`: tarefas Celery (`somar`, `fatorial`)
+- `celery_app.py`: configuração do Celery com broker Redis
+- `Dockerfile`: define a imagem do container da API
+- `docker-compose.yml`: orquestra `app`, `redis` e `celery`
+- `requirements.txt`: dependências Python usadas no projeto
+- `.env`: variáveis de ambiente para a aplicação
 
-### Build da imagem (`Dockerfile`)
+## Variáveis de ambiente
 
-Etapas principais:
+Variáveis lidas pela aplicação:
+- `DATABASE_URL` — padrão: `sqlite:///./livros.db`
+- `MEU_USUARIO` — padrão: `admin`
+- `MINHA_SENHA` — padrão: `admin`
 
-1. Base `python:3.14-slim`
-2. `WORKDIR /app`
-3. Instalação do Poetry
-4. Copia `pyproject.toml` e `poetry.lock`
-5. Instalação das dependencias (`poetry install --no-root`)
-6. Copia o restante do projeto
-7. Exposição da porta `8000`
-8. Comando padrao para iniciar a API com Uvicorn
-
-### Execução com Compose (`docker-compose.yml`)
-
-- `build: .`: constroi imagem a partir do `Dockerfile`
-- `container_name: livros-api`: nome do container
-- `ports: "8000:8000"`: publica a API para a maquina host
-- `volumes: .:/app`: sincroniza codigo host/container
-- `env_file: .env`: injeta variaveis de ambiente no container
-- `command`: comando de start da aplicacao
-- `deploy`: configuracoes voltadas a Swarm (nem sempre aplicadas no Compose local)
-
-### Mapeamento de Porta
-
-`"8000:8000"` significa:
-- porta `8000` da sua maquina (host)
-- encaminhada para a porta `8000` do container
-
-Acesso:
-- `http://localhost:8000`
-
-### Fluxo de Requisição (cliente externo -> container)
-
-```mermaid
-sequenceDiagram
-    participant C as Cliente (browser/curl)
-    participant H as Host localhost:8000
-    participant D as Docker (port mapping)
-    participant U as Uvicorn no container
-    participant A as FastAPI main:app
-    participant DB as SQLite livros.db
-
-    C->>H: HTTP request
-    H->>D: Encaminha para container:8000
-    D->>U: Entrega conexao
-    U->>A: Resolve rota/dependencias
-    A->>DB: Leitura/escrita (quando necessario)
-    DB-->>A: Resultado
-    A-->>U: JSON + status code
-    U-->>C: HTTP response
-```
-
-## Variaveis de Ambiente
-
-Variaveis lidas pela aplicacao:
-- `DATABASE_URL` (padrao: `sqlite:///./livros.db`)
-- `MEU_USUARIO` (padrao: `admin`)
-- `MINHA_SENHA` (padrao: `admin`)
-
-Variavel presente no `.env` do projeto:
-- `PYTHONNUNBUFFERED=1` (configuracao de runtime Python, nao usada diretamente no codigo da API)
-
-Exemplo:
+Exemplo de `.env`:
 
 ```env
 MEU_USUARIO=admin
@@ -112,74 +58,113 @@ PYTHONUNBUFFERED=1
 
 ## Endpoints
 
-### Sem autenticacao
+### Sem autenticação
 
-| Metodo | Rota | Descricao |
+| Método | Rota | Descrição |
 |---|---|---|
 | GET | `/` | Health check da API |
-| GET | `/chamadas-externas` | Simula 3 chamadas assincronas concorrentes |
+| GET | `/chamadas-externas` | Simula 3 chamadas assíncronas concorrentes |
 
-### Com HTTP Basic Auth (`-u usuario:senha`)
+### Com HTTP Basic Auth
 
-| Metodo | Rota | Descricao |
+| Método | Rota | Descrição |
 |---|---|---|
-| GET | `/livros?page=1&limit=10` | Lista livros com paginacao |
+| GET | `/livros?page=1&limit=10` | Lista livros com paginação |
 | POST | `/adiciona` | Cadastra um livro |
 | PUT | `/atualiza/{id_livro}` | Atualiza um livro pelo ID |
 | DELETE | `/deletar/{id_livro}` | Remove um livro pelo ID |
 
-## Como Executar
+## Execução local
 
-### Local (Poetry)
+### Usando `venv`
 
-```bash
-poetry install
-poetry run uvicorn main:app --reload
+No PowerShell:
+
+```powershell
+python -m venv venv
+.\venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
+python -m uvicorn main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-API em:
+No Linux / WSL:
+
+```bash
+python -m venv venv
+source venv/bin/activate
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
+python -m uvicorn main:app --reload --host 0.0.0.0 --port 8000
+```
+
+A API ficará disponível em:
 - `http://127.0.0.1:8000`
 
-### Docker Compose
+## Execução com container
+
+### Recomendado: WSL + Podman Compose
+
+Se você usa Windows com WSL, a forma mais confiável é rodar o `podman-compose` dentro do Ubuntu:
+
+```bash
+cd /mnt/c/Users/Usuario/Desktop/Back-end-Project-Python
+podman-compose up --build
+```
+
+Se quiser parar os serviços:
+
+```bash
+podman-compose down
+```
+
+### Alternativa: Docker Compose
+
+Se você tiver Docker instalado no Windows:
 
 ```bash
 docker compose up --build
 ```
 
-API em:
-- `http://localhost:8000`
+> Observação: `podman-compose` precisa do binário `podman` acessível no sistema. No Windows, usar diretamente o terminal WSL é a forma recomendada.
 
-## Exemplos de Uso com cURL
+## Uso do projeto
 
-```bash
-curl "http://127.0.0.1:8000/"
-```
+### Verificar se está rodando
 
 ```bash
-curl "http://127.0.0.1:8000/chamadas-externas"
+curl http://127.0.0.1:8000/
 ```
+
+### Listar livros
 
 ```bash
 curl -u admin:admin "http://127.0.0.1:8000/livros?page=1&limit=10"
 ```
 
+### Adicionar livro
+
 ```bash
 curl -u admin:admin -X POST "http://127.0.0.1:8000/adiciona" \
   -H "Content-Type: application/json" \
-  -d "{\"nome_livro\":\"Clean Code\",\"autor_livro\":\"Robert C. Martin\",\"ano_livro\":2008}"
+  -d '{"nome_livro":"Clean Code","autor_livro":"Robert C. Martin","ano_livro":2008}'
 ```
+
+### Atualizar livro
 
 ```bash
 curl -u admin:admin -X PUT "http://127.0.0.1:8000/atualiza/1" \
   -H "Content-Type: application/json" \
-  -d "{\"nome_livro\":\"Clean Code (2a edicao)\",\"autor_livro\":\"Robert C. Martin\",\"ano_livro\":2009}"
+  -d '{"nome_livro":"Clean Code (2a edicao)","autor_livro":"Robert C. Martin","ano_livro":2009}'
 ```
+
+### Deletar livro
 
 ```bash
 curl -u admin:admin -X DELETE "http://127.0.0.1:8000/deletar/1"
 ```
 
-## Estrutura do Projeto
+## Estrutura do projeto
 
 ```text
 .
@@ -187,16 +172,16 @@ curl -u admin:admin -X DELETE "http://127.0.0.1:8000/deletar/1"
 ├── .env
 ├── docker-compose.yml
 ├── Dockerfile
-├── livros.db
 ├── main.py
-├── poetry.lock
-├── pyproject.toml
+├── requirements.txt
+├── celery_app.py
+├── tasks.py
 └── README.md
 ```
 
-## Documentação Automatica
+## Documentação automática
 
-Com a API rodando:
+Com a API rodando, acesse:
 - Swagger UI: `http://127.0.0.1:8000/docs`
 - ReDoc: `http://127.0.0.1:8000/redoc`
 - OpenAPI JSON: `http://127.0.0.1:8000/openapi.json`
