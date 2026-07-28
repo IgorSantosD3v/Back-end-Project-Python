@@ -13,7 +13,8 @@ dependencies = [
     "pydantic>=2.13.4,<3.0.0",
     "redis>=8.0.1,<9.0.0",
     "celery>=5.6.3,<6.0.0",
-    "kafka-python (>=3.0.9,<4.0.0)"
+    "kafka-python (>=3.0.9,<4.0.0)",
+    "pytest (>=9.1.1,<10.0.0)"
 ]
 
 
@@ -24,3 +25,5 @@ package-mode = false
 requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
 
+[tool.pytest.ini_options]
+pythonpath = ["."]
