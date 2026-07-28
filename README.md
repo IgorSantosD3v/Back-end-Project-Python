@@ -8,7 +8,7 @@ O projeto implementa:
 - paginação na listagem
 - exemplo de concorrência assíncrona com `asyncio`
 - execução local com `venv` e `requirements.txt`
-- orquestração de containers com `podman-compose`/Docker Compose
+- orquestração de containers com Docker Compose / Podman Compose
 - worker Celery usando Redis
 - broker Kafka com Zookeeper e interface Kafka UI
 
@@ -23,7 +23,7 @@ O projeto implementa:
 - Kafka
 - Zookeeper
 - SQLite
-- Podman / Docker
+- Docker / Podman
 
 ## Arquivos principais
 
@@ -74,9 +74,9 @@ PYTHONUNBUFFERED=1
 
 ## Execução local
 
-### Usando `venv`
+### Criar e ativar `venv`
 
-No PowerShell:
+No PowerShell (Windows):
 
 ```powershell
 python -m venv venv
@@ -99,11 +99,21 @@ python -m uvicorn main:app --reload --host 0.0.0.0 --port 8000
 A API ficará disponível em:
 - `http://127.0.0.1:8000`
 
+### Executar testes
+
+```bash
+pytest
+```
+
 ## Execução com containers
 
-### Recomendado: WSL + Podman Compose
+### Docker Compose
 
-Se você usa Windows com WSL, a forma mais confiável é rodar o `podman-compose` dentro do Ubuntu:
+```bash
+docker compose up -d --build
+```
+
+### Podman Compose (WSL recomendado)
 
 ```bash
 cd /mnt/c/Users/Usuario/Desktop/Back-end-Project-Python
@@ -113,12 +123,16 @@ podman-compose up -d --build
 Para parar os serviços:
 
 ```bash
+docker compose down
+# ou
 podman-compose down
 ```
 
 ### Verificar status
 
 ```bash
+docker ps
+# ou
 podman ps
 ```
 
@@ -128,16 +142,6 @@ podman ps
 - Kafka UI: `http://127.0.0.1:8080`
 - Redis: `127.0.0.1:6379`
 - Kafka broker: `127.0.0.1:9094`
-
-### Alternativa: Docker Compose
-
-Se você tiver Docker instalado no Windows:
-
-```bash
-docker compose up -d --build
-```
-
-> Observação: `podman-compose` precisa do binário `podman` acessível no sistema. O fluxo mais estável no Windows é rodar tudo dentro do WSL/Ubuntu.
 
 ## Uso do projeto
 
