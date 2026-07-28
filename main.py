@@ -29,6 +29,7 @@ from fastapi import BackgroundTasks
 from tasks import somar, fatorial
 from celery_app import celery_app
 from celery.result import AsyncResult
+from kafka_producer import enviar_evento
 # BaseModel é usado para definir "modelos de entrada" e validar dados automaticamente.
 from pydantic import BaseModel
 
@@ -311,6 +312,11 @@ async def post_livros(
     db.add(novo_livro)
     db.commit()
     db.refresh(novo_livro)
+
+    enviar_evento("livros_eventos", {
+        "acao": "criar",
+        "livro": livro.dict()
+    })
 
     # Resposta de sucesso com os dados salvos.
     return {

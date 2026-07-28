@@ -2,30 +2,78 @@
 version: "3.8"
 
 services:
-    app:
-        build: .
-        container_name: livros-api
-        ports:
-            - "8000:8000"
-        volumes:
-            - .:/app
-        env_file:
-            - .env
-        command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+  app:
+    build: .
+    container_name: livros-api
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    env_file:
+      - .env
+    environment:
+      KAFKA_SERVER: kafka:9092
+    depends_on:
+      redis:
+        condition: service_started
+      kafka:
+        condition: service_started
+    command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
 
-    redis:
-        image: docker.io/library/redis:7-alpine
-        container_name: livros-redis
-        ports:
-            - "6379:6379"
+  redis:
+    image: docker.io/library/redis:7-alpine
+    container_name: livros-redis
+    ports:
+      - "6379:6379"
 
-    celery:
-        build: .
-        container_name: livros-celery
-        command: ["celery", "-A", "celery_app:celery_app", "worker", "-Q", "livros", "--loglevel=info"]
-        volumes:
-            - .:/app
-        depends_on:
-            - redis
-        env_file:
-            - .env
+  celery:
+    build: .
+    container_name: livros-celery
+    command: ["celery", "-A", "celery_app:celery_app", "worker", "-Q", "livros", "--loglevel=info"]
+    volumes:
+      - .:/app
+    depends_on:
+      redis:
+        condition: service_started
+      kafka:
+        condition: service_started
+    env_file:
+      - .env
+
+  zookeeper:
+    image: docker.io/confluentinc/cp-zookeeper:7.4.1
+    container_name: livros-zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2181:2181"
+
+  kafka:
+    image: docker.io/confluentinc/cp-kafka:7.4.1
+    container_name: livros-kafka
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+      - "9094:9094"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:9094
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      KAFKA_LOG4J_ROOT_LOGLEVEL: INFO
+
+  kafka-ui:
+    image: docker.io/provectuslabs/kafka-ui:latest
+    container_name: livros-kafka-ui
+    depends_on:
+      - kafka
+    ports:
+      - "8080:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092

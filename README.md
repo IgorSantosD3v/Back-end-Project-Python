@@ -1,6 +1,6 @@
 # API de Livros
 
-API REST para gerenciamento de livros com FastAPI, SQLAlchemy e SQLite.
+API REST para gerenciamento de livros com FastAPI, SQLAlchemy, SQLite, Celery, Redis e Kafka.
 
 O projeto implementa:
 - CRUD completo de livros
@@ -8,35 +8,31 @@ O projeto implementa:
 - paginação na listagem
 - exemplo de concorrência assíncrona com `asyncio`
 - execução local com `venv` e `requirements.txt`
-- orquestração de container via `podman-compose`/Docker Compose
+- orquestração de containers com `podman-compose`/Docker Compose
 - worker Celery usando Redis
+- broker Kafka com Zookeeper e interface Kafka UI
 
 ## Stack
 
-- Python `>=3.14`
+- Python `3.14`
 - FastAPI
 - SQLAlchemy `2.x`
 - Pydantic
 - Celery
 - Redis
+- Kafka
+- Zookeeper
 - SQLite
 - Podman / Docker
-
-## O que mudou
-
-O projeto agora usa `requirements.txt` para instalação local e o contêiner é construído com:
-- `Dockerfile` + `requirements.txt`
-- `docker-compose.yml` / `podman-compose.yml` para orquestração
-
-A execução local não depende mais de Poetry obrigatoriamente.
 
 ## Arquivos principais
 
 - `main.py`: aplicação FastAPI, modelos, rotas, autenticação e banco
 - `tasks.py`: tarefas Celery (`somar`, `fatorial`)
 - `celery_app.py`: configuração do Celery com broker Redis
+- `kafka_producer.py`: produtor simples para eventos Kafka
 - `Dockerfile`: define a imagem do container da API
-- `docker-compose.yml`: orquestra `app`, `redis` e `celery`
+- `docker-compose.yml`: orquestra `app`, `redis`, `celery`, `zookeeper`, `kafka` e `kafka-ui`
 - `requirements.txt`: dependências Python usadas no projeto
 - `.env`: variáveis de ambiente para a aplicação
 
@@ -46,6 +42,7 @@ Variáveis lidas pela aplicação:
 - `DATABASE_URL` — padrão: `sqlite:///./livros.db`
 - `MEU_USUARIO` — padrão: `admin`
 - `MINHA_SENHA` — padrão: `admin`
+- `KAFKA_SERVER` — padrão: `kafka:9092`
 
 Exemplo de `.env`:
 
@@ -53,6 +50,7 @@ Exemplo de `.env`:
 MEU_USUARIO=admin
 MINHA_SENHA=admin
 DATABASE_URL=sqlite:///./livros.db
+KAFKA_SERVER=kafka:9092
 PYTHONUNBUFFERED=1
 ```
 
@@ -101,7 +99,7 @@ python -m uvicorn main:app --reload --host 0.0.0.0 --port 8000
 A API ficará disponível em:
 - `http://127.0.0.1:8000`
 
-## Execução com container
+## Execução com containers
 
 ### Recomendado: WSL + Podman Compose
 
@@ -109,24 +107,37 @@ Se você usa Windows com WSL, a forma mais confiável é rodar o `podman-compose
 
 ```bash
 cd /mnt/c/Users/Usuario/Desktop/Back-end-Project-Python
-podman-compose up --build
+podman-compose up -d --build
 ```
 
-Se quiser parar os serviços:
+Para parar os serviços:
 
 ```bash
 podman-compose down
 ```
+
+### Verificar status
+
+```bash
+podman ps
+```
+
+### Acessos após subir os containers
+
+- API Swagger: `http://127.0.0.1:8000/docs`
+- Kafka UI: `http://127.0.0.1:8080`
+- Redis: `127.0.0.1:6379`
+- Kafka broker: `127.0.0.1:9094`
 
 ### Alternativa: Docker Compose
 
 Se você tiver Docker instalado no Windows:
 
 ```bash
-docker compose up --build
+docker compose up -d --build
 ```
 
-> Observação: `podman-compose` precisa do binário `podman` acessível no sistema. No Windows, usar diretamente o terminal WSL é a forma recomendada.
+> Observação: `podman-compose` precisa do binário `podman` acessível no sistema. O fluxo mais estável no Windows é rodar tudo dentro do WSL/Ubuntu.
 
 ## Uso do projeto
 
@@ -176,6 +187,7 @@ curl -u admin:admin -X DELETE "http://127.0.0.1:8000/deletar/1"
 ├── requirements.txt
 ├── celery_app.py
 ├── tasks.py
+├── kafka_producer.py
 └── README.md
 ```
 

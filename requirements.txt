@@ -4,3 +4,4 @@ SQLAlchemy
 pydantic
 redis
 celery
+kafka-python
