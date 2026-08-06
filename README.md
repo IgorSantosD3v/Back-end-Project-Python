@@ -141,7 +141,9 @@ podman ps
 - API Swagger: `http://127.0.0.1:8000/docs`
 - Kafka UI: `http://127.0.0.1:8080`
 - Redis: `127.0.0.1:6379`
-- Kafka broker: `127.0.0.1:9094`
+- Kafka broker (externo): `127.0.0.1:9094`
+
+> Observação: internamente o serviço Kafka pode usar `kafka:9092`, mas o mapeamento externo no `docker-compose` expõe `9094`.
 
 ## Uso do projeto
 
