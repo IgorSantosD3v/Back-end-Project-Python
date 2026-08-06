@@ -5,3 +5,4 @@ pydantic
 redis
 celery
 kafka-python
+httpx

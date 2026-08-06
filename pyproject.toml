@@ -14,7 +14,9 @@ dependencies = [
     "redis>=8.0.1,<9.0.0",
     "celery>=5.6.3,<6.0.0",
     "kafka-python (>=3.0.9,<4.0.0)",
-    "pytest (>=9.1.1,<10.0.0)"
+    "httpx>=0.28.0,<0.29.0",
+    "pytest (>=9.1.1,<10.0.0)",
+    "pytest-cov (>=7.1.0,<8.0.0)"
 ]
 
 
@@ -27,3 +29,8 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.pytest.ini_options]
 pythonpath = ["."]
+
+[dependency-groups]
+dev = [
+    "pytest-mock (>=3.15.1,<4.0.0)"
+]
