@@ -25,3 +25,9 @@ spec:
               value: "admin"
             - name: MINHA_SENHA
               value: "admin"
+            - name: REDIS_HOST
+              value: "redis"
+            - name: REDIS_PORT
+              value: "6379"
+            - name: KAFKA_SERVER
+              value: "kafka:9092"
