@@ -1,0 +1,158 @@
+name: BackendProject CI/CD
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  PYTHON_VERSION: "3.14"
+  PROJECT_NAME: "BackendProject"
+  REGISTRY: ghcr.io
+  IMAGE_NAME: backendproject
+
+jobs:
+  test:
+    name: Testes e validação
+    runs-on: ubuntu-latest
+
+    services:
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+
+    env:
+      DATABASE_URL: sqlite:///./livros.db
+      MEU_USUARIO: admin
+      MINHA_SENHA: admin
+      REDIS_HOST: 127.0.0.1
+      REDIS_PORT: 6379
+      KAFKA_SERVER: localhost:9092
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+
+      - name: Instalar Poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: 2.4.1
+          virtualenvs-create: false
+
+      - name: Instalar dependências
+        run: |
+          poetry install --with dev --no-interaction --no-root
+
+      - name: Validar configuração do Poetry
+        run: |
+          poetry check
+
+      - name: Rodar testes
+        run: |
+          poetry run pytest -q --cov=. --cov-report=xml
+
+      - name: Upload do relatório de cobertura
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-report
+          path: coverage.xml
+
+  build-and-push:
+    name: Build e publicação da imagem Docker
+    needs: test
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Configurar Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login no GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build e push da imagem
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ github.repository_owner }}/backendproject:latest
+            ${{ env.REGISTRY }}/${{ github.repository_owner }}/backendproject:${{ github.sha }}
+          labels: |
+            org.opencontainers.image.title=${{ env.PROJECT_NAME }}
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+
+  deploy-kubernetes:
+    name: Deploy no Kubernetes
+    needs: build-and-push
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    env:
+      NAMESPACE: default
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Instalar kubectl
+        uses: azure/setup-kubectl@v4
+        with:
+          version: v1.30.0
+
+      - name: Configurar kubeconfig
+        shell: bash
+        run: |
+          mkdir -p ~/.kube
+          python - <<'PY'
+          import base64
+          import os
+          import pathlib
+          raw = os.environ.get("KUBE_CONFIG_B64", "")
+          if not raw:
+              raise SystemExit("KUBE_CONFIG_B64 está vazio")
+          decoded = base64.b64decode(raw.encode("utf-8")).decode("utf-8")
+          pathlib.Path.home().joinpath(".kube", "config").write_text(decoded, encoding="utf-8")
+          PY
+          chmod 600 ~/.kube/config
+          kubectl version --client
+        env:
+          KUBE_CONFIG_B64: ${{ secrets.KUBE_CONFIG }}
+
+      - name: Substituir imagem no manifesto
+        run: |
+          IMAGE="${{ env.REGISTRY }}/${{ github.repository_owner }}/backendproject:${{ github.sha }}"
+          sed -i "s|image: .*|image: ${IMAGE}|g" deployment.yaml
+
+      - name: Aplicar manifests do Kubernetes
+        run: |
+          kubectl apply -f deployment.yaml -n ${{ env.NAMESPACE }}
+          kubectl apply -f service.yaml -n ${{ env.NAMESPACE }}
+
+      - name: Aguardar rollout
+        run: |
+          kubectl rollout status deployment/livros-api --timeout=180s -n ${{ env.NAMESPACE }}
