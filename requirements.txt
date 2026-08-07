@@ -1,8 +1,0 @@
-fastapi
-uvicorn[standard]
-SQLAlchemy
-pydantic
-redis
-celery
-kafka-python
-httpx

@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: livros-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: livros-api
+  template:
+    metadata:
+      labels:
+        app: livros-api
+    spec:
+      containers:
+        - name: livros-api
+          image: livros-api:lastest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+          env:
+            - name: DATABASE_URL
+              value: "sqlite:///./livros.db"
+            - name: MEU_USUARIO
+              value: "admin"
+            - name: MINHA_SENHA
+              value: "admin"
