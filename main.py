@@ -1,48 +1,20 @@
-# ================================
-# API de Livros com FastAPI
-# ================================
-#
-# Objetivo deste arquivo:
-# criar uma API REST para gerenciar livros usando:
-# 1) FastAPI para as rotas HTTP
-# 2) SQLAlchemy para conversar com o banco SQLite
-# 3) Pydantic para validar os dados recebidos nas requisições
-#
-# A API segue o padrão CRUD:
-# - Create (criar)   -> POST
-# - Read (ler -> buscar) -> GET
-# - Update (atualizar) -> PUT
-# - Delete (deletar) -> DELETE
+"""API de Livros — FastAPI + SQLAlchemy + Celery + Kafka + Elasticsearch."""
 
-# Importa as classes principais do FastAPI:
-# - FastAPI: cria a aplicação
-# - Depends: sistema de injeção de dependências
-# - HTTPException: gera erros HTTP padronizados (400, 401, 404 etc.)
-from fastapi import FastAPI, Depends, HTTPException
-import os
-# Importa utilitários de autenticação Basic Auth:
-# - HTTPBasic: define o "esquema" de segurança
-# - HTTPBasicCredentials: carrega usuário e senha enviados no request
-import redis
-from fastapi.security import HTTPBasic, HTTPBasicCredentials
-from fastapi import BackgroundTasks
-from tasks import somar, fatorial
-from celery_app import celery_app
-from celery.result import AsyncResult
-from kafka_producer import enviar_evento
-# BaseModel é usado para definir "modelos de entrada" e validar dados automaticamente.
-from pydantic import BaseModel
-
-# secrets.compare_digest faz comparação segura de strings (evita timing attacks).
-import secrets
 import asyncio
-# SQLAlchemy:
-# - create_engine: cria a conexão com o banco
-# - Column, Integer, String: definem colunas e tipos da tabela
-from sqlalchemy import create_engine, Integer, String
+import logging
+import logging.config
+import os
+import secrets
+from datetime import datetime
 
-# Session e sessionmaker gerenciam sessões/conexões com o banco.
-# DeclarativeBase / Mapped / mapped_column são o padrão tipado do SQLAlchemy 2.x.
+import redis
+import yaml
+from celery.result import AsyncResult
+from elasticsearch import Elasticsearch
+from fastapi import Depends, FastAPI, HTTPException
+from fastapi.security import HTTPBasic, HTTPBasicCredentials
+from pydantic import BaseModel
+from sqlalchemy import Integer, String, create_engine
 from sqlalchemy.orm import (
     DeclarativeBase,
     Mapped,
@@ -51,78 +23,77 @@ from sqlalchemy.orm import (
     sessionmaker,
 )
 
-# String de conexão com SQLite.
-# "sqlite:///./livros.db" cria/usa um arquivo "livros.db" na pasta do projeto.
+from celery_app import celery_app
+from kafka_producer import enviar_evento
+from tasks import fatorial, somar
+
+# --------------------------------------------------------------------------
+# Configuração
+# --------------------------------------------------------------------------
+
 DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./livros.db")
+ELASTICSEARCH_URL = os.getenv("ELASTICSEARCH_URL", "http://localhost:9200")
+ELASTICSEARCH_INDEX = os.getenv("ELASTICSEARCH_INDEX", "livros-logs")
+REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
+REDIS_PORT = os.getenv("REDIS_PORT", 6379)
+MEU_USUARIO = os.getenv("MEU_USUARIO", "admin")
+MINHA_SENHA = os.getenv("MINHA_SENHA", "admin")
 
-# Cria o "engine" (ponte entre Python e banco).
-# check_same_thread=False é comum no SQLite para uso com FastAPI.
+with open("logging_config.yaml", "r") as f:
+    logging_config = yaml.safe_load(f)
+
+log_file_path = os.getenv("LOG_FILE_PATH", "logs/app.log")
+os.makedirs(os.path.dirname(log_file_path) or ".", exist_ok=True)
+logging_config["handlers"]["file"]["filename"] = log_file_path
+
+logging.config.dictConfig(logging_config)
+
+logger = logging.getLogger(__name__)
+
 engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
-
-# Fabrica de sessões do banco:
-# - autocommit=False: precisamos dar commit manualmente
-# - autoflush=False: evita flush automático em momentos inesperados
-# - bind=engine: vincula essa sessão ao engine criado acima
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+es_client = Elasticsearch(hosts=[ELASTICSEARCH_URL])
+redis_client = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, db=0, decode_responses=True)
+security = HTTPBasic()
 
-# Classe base para nossos modelos ORM (SQLAlchemy 2.x).
+app = FastAPI(
+    title="API de Livros",
+    description="API para gerenciar catálogo de livros.",
+    version="1.0.0",
+    contact={"name": "Igor Santos", "email": "igorsantosdevp@gmail.com"},
+)
+
+
 class Base(DeclarativeBase):
     pass
 
 
-REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
-REDIS_PORT = os.getenv("REDIS_PORT", 6379)
-redis_client = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, db=0, decode_responses=True)
-# Cria a aplicação FastAPI e define o título da documentação automática.
-app = FastAPI(
-    title="API de Livros",
-    description="API para genrenciar catálogo de livros.",
-    version="1.0.0",
-    contact={
-        "name": "Igor Santos",
-        "email": "igorsantosdevp@gmail.com"
-    }
-)
+# --------------------------------------------------------------------------
+# Modelos
+# --------------------------------------------------------------------------
 
-# Credenciais fixas para exemplo didático.
-# Em produção, isso deveria vir de variáveis de ambiente ou banco.
-# Variavel de ambiente é um recurso do sistema operacional para armazenar dados sensíveis (como senhas) fora do código-fonte.
-MEU_USUARIO = os.getenv("MEU_USUARIO", "admin")
-MINHA_SENHA = os.getenv("MINHA_SENHA", "admin")
-
-# Ativa o esquema HTTP Basic para autenticação.
-security = HTTPBasic()
-
-
-# Modelo ORM (tabela no banco)
 class LivroDB(Base):
-    # Nome da tabela no banco de dados.
     __tablename__ = "livros"
 
-    # id: chave primária única de cada livro.
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
-
-    # Demais campos do livro.
-    # index=True acelera algumas consultas de busca.
     nome_livro: Mapped[str] = mapped_column(String, index=True)
     autor_livro: Mapped[str] = mapped_column(String, index=True)
     ano_livro: Mapped[int] = mapped_column(Integer, index=True)
 
 
-# Modelo de validação da API (corpo da requisição).
-# Tudo que chegar em POST/PUT neste formato será validado.
 class Livro(BaseModel):
     nome_livro: str
     autor_livro: str
     ano_livro: int
 
 
-# Cria as tabelas no banco se ainda não existirem.
 Base.metadata.create_all(bind=engine)
 
 
-# Dependência de sessão do banco:
-# abre uma sessão por requisição e garante fechamento ao final.
+# --------------------------------------------------------------------------
+# Dependências
+# --------------------------------------------------------------------------
+
 def sessao_db():
     db = SessionLocal()
     try:
@@ -131,141 +102,123 @@ def sessao_db():
         db.close()
 
 
-# Dependência de autenticação:
-# será "injetada" nas rotas que exigem usuário e senha.
-def autenticar_meu_usuario(
-    credentials: HTTPBasicCredentials = Depends(security),
-):
-    # Compara usuário/senha enviados com os valores esperados.
-    is_username_correct = secrets.compare_digest(
-        credentials.username,
-        MEU_USUARIO,
-    )
-    is_password_correct = secrets.compare_digest(
-        credentials.password,
-        MINHA_SENHA,
-    )
+def autenticar_meu_usuario(credentials: HTTPBasicCredentials = Depends(security)) -> HTTPBasicCredentials:
+    usuario_ok = secrets.compare_digest(credentials.username, MEU_USUARIO)
+    senha_ok = secrets.compare_digest(credentials.password, MINHA_SENHA)
 
-    # Se algum dado estiver incorreto, retorna 401.
-    if not (is_username_correct and is_password_correct):
+    if not (usuario_ok and senha_ok):
         raise HTTPException(
             status_code=401,
             detail="Usuário ou senha incorretos",
             headers={"WWW-Authenticate": "Basic"},
         )
 
+    return credentials
 
-# -------------------------------
-# Rota raiz (teste de funcionamento)
-# -------------------------------
+
+def registrar_log_elasticsearch(**dados):
+    """Envia um log estruturado para o Elasticsearch sem derrubar a request em caso de falha."""
+    try:
+        es_client.index(index=ELASTICSEARCH_INDEX, body={"timestamp": datetime.utcnow().isoformat(), **dados})
+    except Exception as e:
+        logger.error(f"Erro ao enviar log para Elasticsearch: {e}")
+
+
+# --------------------------------------------------------------------------
+# Rotas básicas
+# --------------------------------------------------------------------------
+
 @app.get("/")
 def hello_world():
-    # Endpoint simples para verificar rapidamente se a API está ativa.
+    logger.info("Rota raiz acessada com sucesso.")
     return {"Hello": "World!"}
 
 
-async def chamadas_externas_1():
-   await asyncio.sleep(2)
-   return "Resultado da chamada externa 1"
+# --------------------------------------------------------------------------
+# Tarefas assíncronas (Celery)
+# --------------------------------------------------------------------------
 
-async def chamadas_externas_2():
-   await asyncio.sleep(3)
-   return "Resultado da chamada externa 2"
-
-async def chamadas_externas_3():
-   await asyncio.sleep(1)
-   return "Resultado da chamada externa 3"
-
+def _enfileirar_tarefa(tarefa, mensagem: str):
+    redis_client.lpush("tarefas_ids", tarefa.id)
+    redis_client.ltrim("tarefas_ids", 0, 49)  # mantém só os últimos 50 IDs
+    return {"task_id": tarefa.id, "message": mensagem}
 
 
 @app.post("/calcular/soma")
 def calcular_soma(a: int, b: int):
-    tarefa = somar.delay(a, b)
-    redis_client.lpush("tarefas_ids", tarefa.id)
-    redis_client.ltrim("tarefas_ids", 0, 49)  # Mantém apenas os últimos 50 IDs
-    return{
-        "task_id": tarefa.id,
-        "message": "A soma está sendo processada em segundo plano. Use o task_id para verificar o status."
-    }
+    return _enfileirar_tarefa(
+        somar.delay(a, b),
+        "A soma está sendo processada em segundo plano. Use o task_id para verificar o status.",
+    )
+
 
 @app.post("/calcular/fatorial")
 def calcular_fatorial(n: int):
-    tarefa = fatorial.delay(n)
-    redis_client.lpush("tarefas_ids", tarefa.id)
-    redis_client.ltrim("tarefas_ids", 0, 49)  # Mantém apenas os últimos 50 IDs
-    return{
-        "task_id": tarefa.id,
-        "message": "O cálculo do fatorial está sendo processado em segundo plano. Use o task_id para verificar o status."
-    }
+    return _enfileirar_tarefa(
+        fatorial.delay(n),
+        "O cálculo do fatorial está sendo processado em segundo plano. Use o task_id para verificar o status.",
+    )
+
 
 @app.get("/tarefas/recentes")
 def listar_tarefas_recentes():
-    ids = redis_client.lrange("tarefas_ids", 0, -1)
     tarefas = []
-    for task_id in ids:
+    for task_id in redis_client.lrange("tarefas_ids", 0, -1):
         resultado = AsyncResult(task_id, app=celery_app)
         tarefas.append({
             "task_id": task_id,
             "status": resultado.status,
-            "result": resultado.result if resultado.status == "SUCCESS" else None
+            "result": resultado.result if resultado.status == "SUCCESS" else None,
         })
-    return{"tarefas": tarefas}
+    return {"tarefas": tarefas}
 
+
+# --------------------------------------------------------------------------
+# Chamadas externas concorrentes (demo de asyncio)
+# --------------------------------------------------------------------------
+
+async def _chamada_externa(segundos: int, resultado: str) -> str:
+    await asyncio.sleep(segundos)
+    return resultado
 
 
 @app.get("/chamadas-externas")
 async def chamadas_externas():
-    tarefa1 = asyncio.create_task(chamadas_externas_1())
-    tarefa2 = asyncio.create_task(chamadas_externas_2())
-    tarefa3 = asyncio.create_task(chamadas_externas_3())
-    
-    resultado1 = await tarefa1
-    resultado2 = await tarefa2
-    resultado3 = await tarefa3
-    
+    tarefas = [
+        asyncio.create_task(_chamada_externa(2, "Resultado da chamada externa 1")),
+        asyncio.create_task(_chamada_externa(3, "Resultado da chamada externa 2")),
+        asyncio.create_task(_chamada_externa(1, "Resultado da chamada externa 3")),
+    ]
+    resultados = await asyncio.gather(*tarefas)
     return {
         "mensagem": "Todas as chamadas externas foram concluídas!",
-        "resultados": [resultado1, resultado2, resultado3]
+        "resultados": resultados,
     }
 
 
-# GET - Listar livros (READ)
-# -------------------------------
+# --------------------------------------------------------------------------
+# CRUD de livros
+# --------------------------------------------------------------------------
+
 @app.get("/livros")
 async def get_livros(
-    # Paginação:
-    # - page: número da página (começando em 1)
-    # - limit: quantidade de itens por página
     page: int = 1,
     limit: int = 10,
-    # Injeção da sessão do banco
     db: Session = Depends(sessao_db),
-    # Injeção da autenticação (obrigatória nesta rota)
     credentials: HTTPBasicCredentials = Depends(autenticar_meu_usuario),
 ):
-    # Validação básica dos parâmetros de paginação.
     if page < 1 or limit < 1:
-        raise HTTPException(
-            status_code=400,
-            detail="Page ou limit estão com valores inválidos!",
-        )
+        raise HTTPException(status_code=400, detail="Page ou limit estão com valores inválidos!")
 
-    # Consulta paginada:
-    # offset "pula" registros das páginas anteriores.
     livros = db.query(LivroDB).offset((page - 1) * limit).limit(limit).all()
 
-    # Se não houver livros, devolve mensagem amigável.
     if not livros:
         return {"message": "Não existe nenhum livro!"}
 
-    # Conta total de livros para o frontend saber quantos itens existem no banco.
-    total_livros = db.query(LivroDB).count()
-
-    # Retorno em formato JSON.
-    return {
+    response = {
         "page": page,
         "limit": limit,
-        "total": total_livros,
+        "total_livros": db.query(LivroDB).count(),
         "livros": [
             {
                 "id": livro.id,
@@ -277,48 +230,39 @@ async def get_livros(
         ],
     }
 
+    registrar_log_elasticsearch(
+        endpoint="/livros",
+        usuario=credentials.username,
+        page=page,
+        limit=limit,
+        status="success",
+        total_livros=len(livros),
+    )
 
-# -------------------------------
-# POST - Adicionar livro (CREATE)
-# -------------------------------
+    return response
+
+
 @app.post("/adiciona")
 async def post_livros(
-    # "livro" chega no corpo da requisição e é validado por Pydantic.
     livro: Livro,
     db: Session = Depends(sessao_db),
     credentials: HTTPBasicCredentials = Depends(autenticar_meu_usuario),
 ):
-    # Verifica se já existe livro com mesmo nome + autor para evitar duplicidade.
-    db_livro = (
+    ja_existe = (
         db.query(LivroDB)
-        .filter(
-            LivroDB.nome_livro == livro.nome_livro,
-            LivroDB.autor_livro == livro.autor_livro,
-        )
+        .filter(LivroDB.nome_livro == livro.nome_livro, LivroDB.autor_livro == livro.autor_livro)
         .first()
     )
-    if db_livro:
+    if ja_existe:
         raise HTTPException(status_code=400, detail="Esse livro já existe!")
 
-    # Cria um objeto ORM com os dados recebidos.
-    novo_livro = LivroDB(
-        nome_livro=livro.nome_livro,
-        autor_livro=livro.autor_livro,
-        ano_livro=livro.ano_livro,
-    )
-
-    # Persistência no banco:
-    # add -> commit -> refresh (refresh traz dados atualizados, como o ID gerado).
+    novo_livro = LivroDB(**livro.dict())
     db.add(novo_livro)
     db.commit()
     db.refresh(novo_livro)
 
-    enviar_evento("livros_eventos", {
-        "acao": "criar",
-        "livro": livro.dict()
-    })
+    enviar_evento("livros_eventos", {"acao": "criar", "livro": livro.dict()})
 
-    # Resposta de sucesso com os dados salvos.
     return {
         "message": "Seu livro foi adicionado com sucesso!",
         "livro": {
@@ -330,35 +274,23 @@ async def post_livros(
     }
 
 
-# -------------------------------
-# PUT - Atualizar livro (UPDATE)
-# -------------------------------
 @app.put("/atualiza/{id_livro}")
 async def put_livros(
-    # id_livro vem da URL, por isso está entre chaves na rota.
     id_livro: int,
-    # "livro" vem no corpo, com os novos dados.
     livro: Livro,
     db: Session = Depends(sessao_db),
     credentials: HTTPBasicCredentials = Depends(autenticar_meu_usuario),
 ):
-    # Busca no banco pelo id informado.
     db_livro = db.query(LivroDB).filter(LivroDB.id == id_livro).first()
-
-    # Se não existir, retorna 404.
     if not db_livro:
         raise HTTPException(status_code=404, detail="Esse livro não foi encontrado!")
 
-    # Atualiza os campos do registro.
     db_livro.nome_livro = livro.nome_livro
     db_livro.autor_livro = livro.autor_livro
     db_livro.ano_livro = livro.ano_livro
-
-    # Salva mudanças.
     db.commit()
     db.refresh(db_livro)
 
-    # Retorna o livro atualizado.
     return {
         "message": "Seu livro foi atualizado com sucesso!",
         "livro": {
@@ -370,29 +302,17 @@ async def put_livros(
     }
 
 
-# -------------------------------
-# DELETE - Remover livro (DELETE)
-# -------------------------------
 @app.delete("/deletar/{id_livro}")
 async def delete_livro(
     id_livro: int,
     db: Session = Depends(sessao_db),
     credentials: HTTPBasicCredentials = Depends(autenticar_meu_usuario),
 ):
-    # Primeiro, procura o livro.
     db_livro = db.query(LivroDB).filter(LivroDB.id == id_livro).first()
-
-    # Se não achar, devolve erro 404.
     if not db_livro:
-        raise HTTPException(
-            status_code=404,
-            detail="Esse livro não foi encontrado!",
-        )
+        raise HTTPException(status_code=404, detail="Esse livro não foi encontrado!")
 
-    # Se achar, remove e confirma a transação.
     db.delete(db_livro)
     db.commit()
 
-    # Mensagem final de sucesso.
     return {"message": "Seu livro foi deletado com sucesso!"}
-    

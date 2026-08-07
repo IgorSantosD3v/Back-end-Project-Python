@@ -17,7 +17,8 @@ dependencies = [
     "httpx>=0.28.0,<0.29.0",
     "pytest (>=9.1.1,<10.0.0)",
     "pytest-cov (>=7.1.0,<8.0.0)",
-    "kubernetes (>=36.0.3,<37.0.0)"
+    "kubernetes (>=36.0.3,<37.0.0)",
+    "elasticsearch (>=9.5.0,<10.0.0)"
 ]
 
 
