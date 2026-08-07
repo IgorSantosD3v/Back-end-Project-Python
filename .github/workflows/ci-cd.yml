@@ -85,6 +85,10 @@ jobs:
       - name: Checkout do código
         uses: actions/checkout@v4
 
+      - name: Normalizar nome do owner (lowercase)
+        id: owner
+        run: echo "name=$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')" >> "$GITHUB_OUTPUT"
+
       - name: Configurar Docker Buildx
         uses: docker/setup-buildx-action@v3
 
@@ -101,8 +105,8 @@ jobs:
           context: .
           push: true
           tags: |
-            ${{ env.REGISTRY }}/${{ github.repository_owner }}/backendproject:latest
-            ${{ env.REGISTRY }}/${{ github.repository_owner }}/backendproject:${{ github.sha }}
+            ${{ env.REGISTRY }}/${{ steps.owner.outputs.name }}/backendproject:latest
+            ${{ env.REGISTRY }}/${{ steps.owner.outputs.name }}/backendproject:${{ github.sha }}
           labels: |
             org.opencontainers.image.title=${{ env.PROJECT_NAME }}
             org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
@@ -118,6 +122,10 @@ jobs:
     steps:
       - name: Checkout do código
         uses: actions/checkout@v4
+
+      - name: Normalizar nome do owner (lowercase)
+        id: owner
+        run: echo "name=$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')" >> "$GITHUB_OUTPUT"
 
       - name: Instalar kubectl
         uses: azure/setup-kubectl@v4
@@ -145,7 +153,7 @@ jobs:
 
       - name: Substituir imagem no manifesto
         run: |
-          IMAGE="${{ env.REGISTRY }}/${{ github.repository_owner }}/backendproject:${{ github.sha }}"
+          IMAGE="${{ env.REGISTRY }}/${{ steps.owner.outputs.name }}/backendproject:${{ github.sha }}"
           sed -i "s|image: .*|image: ${IMAGE}|g" deployment.yaml
 
       - name: Aplicar manifests do Kubernetes
