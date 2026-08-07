@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: livros-api
-          image: livros-api:lastest
+          image: ghcr.io/igorsantosd3v/backendproject:latest
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8000
