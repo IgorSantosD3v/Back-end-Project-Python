@@ -1,61 +1,81 @@
-Atualizei o README com uma visão mais completa da stack e das tecnologias do projeto.
+# 📚 API de Livros
 
-```markdown
-# API de Livros
+API REST para gerenciamento de livros, construída com **FastAPI**, **SQLAlchemy**, **SQLite**, **Celery**, **Redis** e **Kafka**.
 
-API REST para gerenciamento de livros com FastAPI, SQLAlchemy, SQLite, Celery, Redis e Kafka.
+O projeto foi pensado como um estudo prático de arquitetura backend, unindo CRUD, autenticação, processamento assíncrono e mensageria em um único ambiente containerizado.
 
-O projeto implementa:
+---
+
+## ✨ Funcionalidades
+
 - CRUD completo de livros
-- autenticação HTTP Basic nas rotas de livros
-- paginação na listagem
-- exemplo de concorrência assíncrona com `asyncio`
-- execução local com `venv` e `requirements.txt`
-- orquestração de containers com Docker Compose / Podman Compose
-- worker Celery usando Redis
-- broker Kafka com Zookeeper e interface Kafka UI
+- Autenticação HTTP Basic nas rotas de livros
+- Paginação na listagem
+- Exemplo de concorrência assíncrona com `asyncio`
+- Worker Celery usando Redis como broker/backend
+- Broker Kafka com Zookeeper e interface Kafka UI
+- Execução local via `venv` + `requirements.txt`
+- Orquestração de containers com Docker Compose / Podman Compose
 
-## Tecnologias presentes
+---
 
-Esta aplicação utiliza uma stack completa de backend com foco em API REST, banco de dados relacional, fila de tarefas, mensageria e containerização:
+## 🛠️ Stack utilizada
 
-- Python `3.14`
-- FastAPI para criação da API REST
-- Uvicorn como servidor ASGI
-- SQLAlchemy `2.x` como ORM
-- SQLite como banco de dados local
-- Pydantic para validação de dados
-- HTTP Basic Auth para autenticação das rotas de livros
-- `asyncio` para execução de chamadas assíncronas
-- Celery para processamento assíncrono de tarefas
-- Redis como broker/resultado para Celery
-- Kafka como broker de eventos
-- Zookeeper como coordenador do Kafka
-- Kafka UI para visualização e inspeção do cluster Kafka
-- Docker / Podman para containerização
-- Docker Compose / Podman Compose para orquestração dos serviços
-- pytest para execução de testes
-- Arquivos `.env` para configuração por variáveis de ambiente
-- Swagger / ReDoc / OpenAPI gerados automaticamente pelo FastAPI
+| Categoria | Tecnologias |
+|---|---|
+| Linguagem | Python `3.14` |
+| API | FastAPI, Uvicorn (ASGI) |
+| Dados | SQLAlchemy `2.x`, SQLite, Pydantic |
+| Autenticação | HTTP Basic Auth |
+| Assincronismo | `asyncio` |
+| Tarefas em background | Celery + Redis |
+| Mensageria | Kafka, Zookeeper, Kafka UI |
+| Containerização | Docker / Podman, Docker Compose / Podman Compose |
+| Testes | pytest |
+| Configuração | Arquivos `.env` |
+| Documentação | Swagger, ReDoc, OpenAPI (gerados automaticamente pelo FastAPI) |
 
-## Arquivos principais
+---
 
-- `main.py`: aplicação FastAPI, modelos, rotas, autenticação e banco
-- `tasks.py`: tarefas Celery (`somar`, `fatorial`)
-- `celery_app.py`: configuração do Celery com broker Redis
-- `kafka_producer.py`: produtor simples para eventos Kafka
-- `Dockerfile`: define a imagem do container da API
-- `docker-compose.yml`: orquestra `app`, `redis`, `celery`, `zookeeper`, `kafka` e `kafka-ui`
-- `requirements.txt`: dependências Python usadas no projeto
-- `.env`: variáveis de ambiente para a aplicação
+## 📁 Estrutura do projeto
 
-## Variáveis de ambiente
+```text
+.
+├── .dockerignore
+├── .env
+├── docker-compose.yml
+├── Dockerfile
+├── main.py
+├── requirements.txt
+├── celery_app.py
+├── tasks.py
+├── kafka_producer.py
+└── README.md
+```
 
-Variáveis lidas pela aplicação:
-- `DATABASE_URL` — padrão: `sqlite:///./livros.db`
-- `MEU_USUARIO` — padrão: `admin`
-- `MINHA_SENHA` — padrão: `admin`
-- `KAFKA_SERVER` — padrão: `kafka:9092`
+**Arquivos principais:**
+
+| Arquivo | Responsabilidade |
+|---|---|
+| `main.py` | Aplicação FastAPI: modelos, rotas, autenticação e banco |
+| `tasks.py` | Tarefas Celery (`somar`, `fatorial`) |
+| `celery_app.py` | Configuração do Celery com broker Redis |
+| `kafka_producer.py` | Produtor simples para eventos Kafka |
+| `Dockerfile` | Definição da imagem do container da API |
+| `docker-compose.yml` | Orquestra `app`, `redis`, `celery`, `zookeeper`, `kafka` e `kafka-ui` |
+| `requirements.txt` | Dependências Python do projeto |
+| `.env` | Variáveis de ambiente da aplicação |
+
+---
+
+## ⚙️ Variáveis de ambiente
+
+| Variável | Padrão | Descrição |
+|---|---|---|
+| `DATABASE_URL` | `sqlite:///./livros.db` | String de conexão do banco |
+| `MEU_USUARIO` | `admin` | Usuário para HTTP Basic Auth |
+| `MINHA_SENHA` | `admin` | Senha para HTTP Basic Auth |
+| `KAFKA_SERVER` | `kafka:9092` | Endereço do broker Kafka |
 
 Exemplo de `.env`:
 
@@ -67,7 +87,87 @@ KAFKA_SERVER=kafka:9092
 PYTHONUNBUFFERED=1
 ```
 
-## Endpoints
+---
+
+## 🚀 Executando localmente
+
+### 1. Criar e ativar o ambiente virtual
+
+**PowerShell (Windows):**
+
+```powershell
+python -m venv venv
+.\venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
+python -m uvicorn main:app --reload --host 0.0.0.0 --port 8000
+```
+
+**Linux / WSL:**
+
+```bash
+python -m venv venv
+source venv/bin/activate
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
+python -m uvicorn main:app --reload --host 0.0.0.0 --port 8000
+```
+
+A API ficará disponível em `http://127.0.0.1:8000`.
+
+### 2. Rodar os testes
+
+```bash
+pytest
+```
+
+---
+
+## 🐳 Executando com containers
+
+### Docker Compose
+
+```bash
+docker compose up -d --build
+```
+
+### Podman Compose (WSL recomendado)
+
+```bash
+cd /mnt/c/Users/Usuario/Desktop/Back-end-Project-Python
+podman-compose up -d --build
+```
+
+### Parar os serviços
+
+```bash
+docker compose down
+# ou
+podman-compose down
+```
+
+### Verificar status dos containers
+
+```bash
+docker ps
+# ou
+podman ps
+```
+
+### Acessos após subir os containers
+
+| Serviço | Endereço |
+|---|---|
+| API Swagger | `http://127.0.0.1:8000/docs` |
+| Kafka UI | `http://127.0.0.1:8080` |
+| Redis | `127.0.0.1:6379` |
+| Kafka broker (externo) | `127.0.0.1:9094` |
+
+> ⚠️ **Observação:** internamente o serviço Kafka usa `kafka:9092`, mas o `docker-compose` mapeia a porta externa para `9094`.
+
+---
+
+## 📡 Endpoints
 
 ### Sem autenticação
 
@@ -85,94 +185,23 @@ PYTHONUNBUFFERED=1
 | PUT | `/atualiza/{id_livro}` | Atualiza um livro pelo ID |
 | DELETE | `/deletar/{id_livro}` | Remove um livro pelo ID |
 
-## Execução local
+---
 
-### Criar e ativar `venv`
+## 💻 Exemplos de uso
 
-No PowerShell (Windows):
-
-```powershell
-python -m venv venv
-.\venv\Scripts\Activate.ps1
-python -m pip install --upgrade pip
-python -m pip install -r requirements.txt
-python -m uvicorn main:app --reload --host 0.0.0.0 --port 8000
-```
-
-No Linux / WSL:
-
-```bash
-python -m venv venv
-source venv/bin/activate
-python -m pip install --upgrade pip
-python -m pip install -r requirements.txt
-python -m uvicorn main:app --reload --host 0.0.0.0 --port 8000
-```
-
-A API ficará disponível em:
-- `http://127.0.0.1:8000`
-
-### Executar testes
-
-```bash
-pytest
-```
-
-## Execução com containers
-
-### Docker Compose
-
-```bash
-docker compose up -d --build
-```
-
-### Podman Compose (WSL recomendado)
-
-```bash
-cd /mnt/c/Users/Usuario/Desktop/Back-end-Project-Python
-podman-compose up -d --build
-```
-
-Para parar os serviços:
-
-```bash
-docker compose down
-# ou
-podman-compose down
-```
-
-### Verificar status
-
-```bash
-docker ps
-# ou
-podman ps
-```
-
-### Acessos após subir os containers
-
-- API Swagger: `http://127.0.0.1:8000/docs`
-- Kafka UI: `http://127.0.0.1:8080`
-- Redis: `127.0.0.1:6379`
-- Kafka broker (externo): `127.0.0.1:9094`
-
-> Observação: internamente o serviço Kafka pode usar `kafka:9092`, mas o mapeamento externo no `docker-compose` expõe `9094`.
-
-## Uso do projeto
-
-### Verificar se está rodando
+**Verificar se a API está no ar:**
 
 ```bash
 curl http://127.0.0.1:8000/
 ```
 
-### Listar livros
+**Listar livros:**
 
 ```bash
 curl -u admin:admin "http://127.0.0.1:8000/livros?page=1&limit=10"
 ```
 
-### Adicionar livro
+**Adicionar livro:**
 
 ```bash
 curl -u admin:admin -X POST "http://127.0.0.1:8000/adiciona" \
@@ -180,7 +209,7 @@ curl -u admin:admin -X POST "http://127.0.0.1:8000/adiciona" \
   -d '{"nome_livro":"Clean Code","autor_livro":"Robert C. Martin","ano_livro":2008}'
 ```
 
-### Atualizar livro
+**Atualizar livro:**
 
 ```bash
 curl -u admin:admin -X PUT "http://127.0.0.1:8000/atualiza/1" \
@@ -188,31 +217,18 @@ curl -u admin:admin -X PUT "http://127.0.0.1:8000/atualiza/1" \
   -d '{"nome_livro":"Clean Code (2a edicao)","autor_livro":"Robert C. Martin","ano_livro":2009}'
 ```
 
-### Deletar livro
+**Deletar livro:**
 
 ```bash
 curl -u admin:admin -X DELETE "http://127.0.0.1:8000/deletar/1"
 ```
 
-## Estrutura do projeto
+---
 
-```text
-.
-├── .dockerignore
-├── .env
-├── docker-compose.yml
-├── Dockerfile
-├── main.py
-├── requirements.txt
-├── celery_app.py
-├── tasks.py
-├── kafka_producer.py
-└── README.md
-```
+## 📖 Documentação automática
 
-## Documentação automática
+Com a API em execução, acesse:
 
-Com a API rodando, acesse:
 - Swagger UI: `http://127.0.0.1:8000/docs`
 - ReDoc: `http://127.0.0.1:8000/redoc`
 - OpenAPI JSON: `http://127.0.0.1:8000/openapi.json`
