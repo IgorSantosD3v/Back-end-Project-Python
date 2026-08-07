@@ -127,6 +127,31 @@ jobs:
         id: owner
         run: echo "name=$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')" >> "$GITHUB_OUTPUT"
 
+      - name: Garantir que o minikube está rodando
+        run: |
+          if ! minikube status | grep -q "apiserver: Running"; then
+            echo "Minikube não está rodando. Tentando iniciar..."
+            minikube start --driver=docker || {
+              echo "Falha ao iniciar. Tentando recriar o cluster do zero..."
+              minikube delete
+              minikube start --driver=docker
+            }
+          else
+            echo "Minikube já está rodando."
+          fi
+
+          echo "Aguardando o apiserver responder..."
+          for i in $(seq 1 30); do
+            if kubectl get nodes >/dev/null 2>&1; then
+              echo "Cluster pronto."
+              break
+            fi
+            echo "Aguardando... ($i/30)"
+            sleep 2
+          done
+
+          kubectl get nodes
+
       - name: Substituir imagem no manifesto
         run: |
           IMAGE="${{ env.REGISTRY }}/${{ steps.owner.outputs.name }}/backendproject:${{ github.sha }}"
