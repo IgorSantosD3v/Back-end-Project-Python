@@ -2,7 +2,7 @@
 
 API REST para gerenciamento de livros, construída com **FastAPI**, **SQLAlchemy**, **SQLite**, **Celery**, **Redis** e **Kafka**.
 
-O projeto foi pensado como um estudo prático de arquitetura backend, unindo CRUD, autenticação, processamento assíncrono e mensageria em um único ambiente containerizado.
+O projeto foi pensado como um estudo prático de arquitetura backend, unindo CRUD, autenticação, processamento assíncrono e mensageria em um único ambiente containerizado — com pipeline de CI/CD completa até o deploy em Kubernetes.
 
 ---
 
@@ -16,6 +16,7 @@ O projeto foi pensado como um estudo prático de arquitetura backend, unindo CRU
 - Broker Kafka com Zookeeper e interface Kafka UI
 - Execução local via `venv` + `requirements.txt`
 - Orquestração de containers com Docker Compose / Podman Compose
+- Pipeline de CI/CD com GitHub Actions: testes → build/push da imagem → deploy em Kubernetes
 
 ---
 
@@ -31,6 +32,9 @@ O projeto foi pensado como um estudo prático de arquitetura backend, unindo CRU
 | Tarefas em background | Celery + Redis |
 | Mensageria | Kafka, Zookeeper, Kafka UI |
 | Containerização | Docker / Podman, Docker Compose / Podman Compose |
+| Orquestração | Kubernetes (minikube) |
+| CI/CD | GitHub Actions (runner self-hosted) |
+| Registro de imagens | GitHub Container Registry (GHCR) |
 | Testes | pytest |
 | Configuração | Arquivos `.env` |
 | Documentação | Swagger, ReDoc, OpenAPI (gerados automaticamente pelo FastAPI) |
@@ -50,6 +54,11 @@ O projeto foi pensado como um estudo prático de arquitetura backend, unindo CRU
 ├── celery_app.py
 ├── tasks.py
 ├── kafka_producer.py
+├── deployment.yaml
+├── service.yaml
+├── .github
+│   └── workflows
+│       └── ci-cd.yml
 └── README.md
 ```
 
@@ -65,6 +74,9 @@ O projeto foi pensado como um estudo prático de arquitetura backend, unindo CRU
 | `docker-compose.yml` | Orquestra `app`, `redis`, `celery`, `zookeeper`, `kafka` e `kafka-ui` |
 | `requirements.txt` | Dependências Python do projeto |
 | `.env` | Variáveis de ambiente da aplicação |
+| `deployment.yaml` | Manifesto Kubernetes do Deployment da API |
+| `service.yaml` | Manifesto Kubernetes do Service que expõe a API |
+| `.github/workflows/ci-cd.yml` | Pipeline de CI/CD (testes, build/push, deploy) |
 
 ---
 
@@ -164,6 +176,68 @@ podman ps
 | Kafka broker (externo) | `127.0.0.1:9094` |
 
 > ⚠️ **Observação:** internamente o serviço Kafka usa `kafka:9092`, mas o `docker-compose` mapeia a porta externa para `9094`.
+
+---
+
+## 🔁 CI/CD (GitHub Actions)
+
+A pipeline (`.github/workflows/ci-cd.yml`) roda em todo `push`/`pull_request` para `main`/`master`, ou manualmente via `workflow_dispatch`, e é composta por três jobs sequenciais:
+
+| Job | Runner | O que faz |
+|---|---|---|
+| **Testes e validação** | `ubuntu-latest` | Instala dependências com Poetry, valida o `pyproject.toml` e roda `pytest` com relatório de cobertura (subindo um serviço Redis para os testes) |
+| **Build e publicação da imagem Docker** | `ubuntu-latest` | Builda a imagem com Docker Buildx e publica no GHCR com as tags `latest` e `<sha do commit>` |
+| **Deploy no Kubernetes** | `self-hosted` | Substitui a imagem no `deployment.yaml`, aplica os manifests (`deployment.yaml` + `service.yaml`) no cluster e aguarda o rollout |
+
+Os dois primeiros jobs rodam em runners hospedados pelo GitHub. O job de deploy roda em um **runner self-hosted**, pois o cluster Kubernetes (minikube) usado neste projeto é local.
+
+### Imagem publicada
+
+As imagens ficam disponíveis no GitHub Container Registry:
+
+```
+ghcr.io/<owner>/backendproject:latest
+ghcr.io/<owner>/backendproject:<sha>
+```
+
+---
+
+## ☸️ Deploy no Kubernetes
+
+O deploy é feito em um cluster **minikube** local, através do runner self-hosted configurado na máquina.
+
+### Pré-requisitos na máquina do runner
+
+- Docker instalado e em execução
+- [minikube](https://minikube.sigs.k8s.io/docs/start/) instalado
+- `kubectl` configurado apontando para o cluster do minikube
+- Runner do GitHub Actions registrado no repositório com a label `self-hosted`
+
+### Subindo o cluster manualmente (se necessário)
+
+```bash
+minikube start --driver=docker
+minikube status
+kubectl get nodes
+```
+
+### Aplicando os manifests manualmente (fora da pipeline)
+
+```bash
+kubectl apply -f deployment.yaml -n default
+kubectl apply -f service.yaml -n default
+kubectl rollout status deployment/livros-api --timeout=180s -n default
+```
+
+### Verificando o deploy
+
+```bash
+kubectl get pods -n default
+kubectl get svc -n default
+kubectl logs -l app=livros-api -n default
+```
+
+> 💡 **Dica:** se o job "Deploy no Kubernetes" falhar com `connection refused`, o cluster minikube provavelmente está parado. A pipeline já inclui um step que verifica e reinicia o minikube automaticamente antes de aplicar os manifests.
 
 ---
 
