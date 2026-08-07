@@ -42,9 +42,19 @@ MINHA_SENHA = os.getenv("MINHA_SENHA", "admin")
 with open("logging_config.yaml", "r") as f:
     logging_config = yaml.safe_load(f)
 
-log_file_path = os.getenv("LOG_FILE_PATH", "logs/app.log")
-os.makedirs(os.path.dirname(log_file_path) or ".", exist_ok=True)
-logging_config["handlers"]["file"]["filename"] = log_file_path
+log_file_path = os.getenv("LOG_FILE_PATH")
+if log_file_path:
+    # Handler de arquivo só é ativado quando LOG_FILE_PATH está definido
+    # (ex: dentro do Docker). Localmente, com `fastapi dev`, ele fica
+    # desativado — caso contrário, o watcher do reload detecta a escrita
+    # do próprio log como "mudança de arquivo" e entra em loop de restart.
+    os.makedirs(os.path.dirname(log_file_path) or ".", exist_ok=True)
+    logging_config["handlers"]["file"]["filename"] = log_file_path
+else:
+    logging_config["handlers"].pop("file", None)
+    logging_config["root"]["handlers"] = [
+        h for h in logging_config["root"]["handlers"] if h != "file"
+    ]
 
 logging.config.dictConfig(logging_config)
 

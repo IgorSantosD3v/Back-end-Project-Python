@@ -2,3 +2,1203 @@
 {"timestamp": "2026-08-07 23:31:19,769", "level": "INFO", "logger": "main", "message": "Rota raiz acessada com sucesso."}
 {"timestamp": "2026-08-07 23:34:40,230", "level": "INFO", "logger": "main", "message": "Rota raiz acessada com sucesso."}
 {"timestamp": "2026-08-07 23:37:14,250", "level": "INFO", "logger": "main", "message": "Rota raiz acessada com sucesso."}
+{"timestamp": "2026-08-07 23:50:30,629", "level": "INFO", "logger": "elastic_transport.transport", "message": "POST http://localhost:9200/livros-logs/_doc [status:N/A duration:0.546s]"}
+{"timestamp": "2026-08-07 23:50:30,656", "level": "WARNING", "logger": "elastic_transport.node_pool", "message": "Node <Urllib3HttpNode(http://localhost:9200)> has failed for 1 times in a row, putting on 1 second timeout"}
+{"timestamp": "2026-08-07 23:50:30,686", "level": "WARNING", "logger": "elastic_transport.transport", "message": "Retrying request after failure (attempt 0 of 3)"}
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.14/site-packages/urllib3/connection.py", line 204, in _new_conn
+    sock = connection.create_connection(
+        (self._dns_host, self.port),
+    ...<2 lines>...
+        socket_options=self.socket_options,
+    )
+  File "/usr/local/lib/python3.14/site-packages/urllib3/util/connection.py", line 85, in create_connection
+    raise err
+  File "/usr/local/lib/python3.14/site-packages/urllib3/util/connection.py", line 73, in create_connection
+    sock.connect(sa)
+    ~~~~~~~~~~~~^^^^
+ConnectionRefusedError: [Errno 111] Connection refused
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.14/site-packages/elastic_transport/_node/_http_urllib3.py", line 167, in perform_request
+    response = self.pool.urlopen(
+        method,
+    ...<4 lines>...
+        **kw,  # type: ignore[arg-type]
+    )
+  File "/usr/local/lib/python3.14/site-packages/urllib3/connectionpool.py", line 842, in urlopen
+    retries = retries.increment(
+        method, url, error=new_e, _pool=self, _stacktrace=sys.exc_info()[2]
+    )
+  File "/usr/local/lib/python3.14/site-packages/urllib3/util/retry.py", line 473, in increment
+    raise reraise(type(error), error, _stacktrace)
+          ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.14/site-packages/urllib3/util/util.py", line 39, in reraise
+    raise value
+  File "/usr/local/lib/python3.14/site-packages/urllib3/connectionpool.py", line 788, in urlopen
+    response = self._make_request(
+        conn,
+    ...<10 lines>...
+        **response_kw,
+    )
+  File "/usr/local/lib/python3.14/site-packages/urllib3/connectionpool.py", line 493, in _make_request
+    conn.request(
+    ~~~~~~~~~~~~^
+        method,
+        ^^^^^^^
+    ...<6 lines>...
+        enforce_content_length=enforce_content_length,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/usr/local/lib/python3.14/site-packages/urllib3/connection.py", line 500, in request
+    self.endheaders()
+    ~~~~~~~~~~~~~~~^^
+  File "/usr/local/lib/python3.14/http/client.py", line 1381, in endheaders
+    self._send_output(message_body, encode_chunked=encode_chunked)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.14/http/client.py", line 1141, in _send_output
+    self.send(msg)
+    ~~~~~~~~~^^^^^
+  File "/usr/local/lib/python3.14/http/client.py", line 1085, in send
+    self.connect()
+    ~~~~~~~~~~~~^^
+  File "/usr/local/lib/python3.14/site-packages/urllib3/connection.py", line 331, in connect
+    self.sock = self._new_conn()
+                ~~~~~~~~~~~~~~^^
+  File "/usr/local/lib/python3.14/site-packages/urllib3/connection.py", line 219, in _new_conn
+    raise NewConnectionError(
+        self, f"Failed to establish a new connection: {e}"
+    ) from e
+urllib3.exceptions.NewConnectionError: HTTPConnection(host='localhost', port=9200): Failed to establish a new connection: [Errno 111] Connection refused
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.14/site-packages/elastic_transport/_transport.py", line 375, in perform_request
+    resp = node.perform_request(
+        method,
+    ...<3 lines>...
+        request_timeout=request_timeout,
+    )
+  File "/usr/local/lib/python3.14/site-packages/elastic_transport/_node/_http_urllib3.py", line 202, in perform_request
+    raise err from e
+elastic_transport.ConnectionError: Connection error caused by: NewConnectionError(HTTPConnection(host='localhost', port=9200): Failed to establish a new connection: [Errno 111] Connection refused)
+{"timestamp": "2026-08-07 23:50:30,768", "level": "INFO", "logger": "elastic_transport.transport", "message": "POST http://localhost:9200/livros-logs/_doc [status:N/A duration:0.001s]"}
+{"timestamp": "2026-08-07 23:50:30,775", "level": "WARNING", "logger": "elastic_transport.node_pool", "message": "Node <Urllib3HttpNode(http://localhost:9200)> has failed for 2 times in a row, putting on 2 second timeout"}
+{"timestamp": "2026-08-07 23:50:30,778", "level": "WARNING", "logger": "elastic_transport.transport", "message": "Retrying request after failure (attempt 1 of 3)"}
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.14/site-packages/urllib3/connection.py", line 204, in _new_conn
+    sock = connection.create_connection(
+        (self._dns_host, self.port),
+    ...<2 lines>...
+        socket_options=self.socket_options,
+    )
+  File "/usr/local/lib/python3.14/site-packages/urllib3/util/connection.py", line 85, in create_connection
+    raise err
+  File "/usr/local/lib/python3.14/site-packages/urllib3/util/connection.py", line 73, in create_connection
+    sock.connect(sa)
+    ~~~~~~~~~~~~^^^^
+ConnectionRefusedError: [Errno 111] Connection refused
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.14/site-packages/elastic_transport/_node/_http_urllib3.py", line 167, in perform_request
+    response = self.pool.urlopen(
+        method,
+    ...<4 lines>...
+        **kw,  # type: ignore[arg-type]
+    )
+  File "/usr/local/lib/python3.14/site-packages/urllib3/connectionpool.py", line 842, in urlopen
+    retries = retries.increment(
+        method, url, error=new_e, _pool=self, _stacktrace=sys.exc_info()[2]
+    )
+  File "/usr/local/lib/python3.14/site-packages/urllib3/util/retry.py", line 473, in increment
+    raise reraise(type(error), error, _stacktrace)
+          ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.14/site-packages/urllib3/util/util.py", line 39, in reraise
+    raise value
+  File "/usr/local/lib/python3.14/site-packages/urllib3/connectionpool.py", line 788, in urlopen
+    response = self._make_request(
+        conn,
+    ...<10 lines>...
+        **response_kw,
+    )
+  File "/usr/local/lib/python3.14/site-packages/urllib3/connectionpool.py", line 493, in _make_request
+    conn.request(
+    ~~~~~~~~~~~~^
+        method,
+        ^^^^^^^
+    ...<6 lines>...
+        enforce_content_length=enforce_content_length,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/usr/local/lib/python3.14/site-packages/urllib3/connection.py", line 500, in request
+    self.endheaders()
+    ~~~~~~~~~~~~~~~^^
+  File "/usr/local/lib/python3.14/http/client.py", line 1381, in endheaders
+    self._send_output(message_body, encode_chunked=encode_chunked)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.14/http/client.py", line 1141, in _send_output
+    self.send(msg)
+    ~~~~~~~~~^^^^^
+  File "/usr/local/lib/python3.14/http/client.py", line 1085, in send
+    self.connect()
+    ~~~~~~~~~~~~^^
+  File "/usr/local/lib/python3.14/site-packages/urllib3/connection.py", line 331, in connect
+    self.sock = self._new_conn()
+                ~~~~~~~~~~~~~~^^
+  File "/usr/local/lib/python3.14/site-packages/urllib3/connection.py", line 219, in _new_conn
+    raise NewConnectionError(
+        self, f"Failed to establish a new connection: {e}"
+    ) from e
+urllib3.exceptions.NewConnectionError: HTTPConnection(host='localhost', port=9200): Failed to establish a new connection: [Errno 111] Connection refused
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.14/site-packages/elastic_transport/_transport.py", line 375, in perform_request
+    resp = node.perform_request(
+        method,
+    ...<3 lines>...
+        request_timeout=request_timeout,
+    )
+  File "/usr/local/lib/python3.14/site-packages/elastic_transport/_node/_http_urllib3.py", line 202, in perform_request
+    raise err from e
+elastic_transport.ConnectionError: Connection error caused by: NewConnectionError(HTTPConnection(host='localhost', port=9200): Failed to establish a new connection: [Errno 111] Connection refused)
+{"timestamp": "2026-08-07 23:50:30,789", "level": "INFO", "logger": "elastic_transport.transport", "message": "POST http://localhost:9200/livros-logs/_doc [status:N/A duration:0.001s]"}
+{"timestamp": "2026-08-07 23:50:30,792", "level": "WARNING", "logger": "elastic_transport.node_pool", "message": "Node <Urllib3HttpNode(http://localhost:9200)> has failed for 3 times in a row, putting on 4 second timeout"}
+{"timestamp": "2026-08-07 23:50:30,796", "level": "WARNING", "logger": "elastic_transport.transport", "message": "Retrying request after failure (attempt 2 of 3)"}
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.14/site-packages/urllib3/connection.py", line 204, in _new_conn
+    sock = connection.create_connection(
+        (self._dns_host, self.port),
+    ...<2 lines>...
+        socket_options=self.socket_options,
+    )
+  File "/usr/local/lib/python3.14/site-packages/urllib3/util/connection.py", line 85, in create_connection
+    raise err
+  File "/usr/local/lib/python3.14/site-packages/urllib3/util/connection.py", line 73, in create_connection
+    sock.connect(sa)
+    ~~~~~~~~~~~~^^^^
+ConnectionRefusedError: [Errno 111] Connection refused
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.14/site-packages/elastic_transport/_node/_http_urllib3.py", line 167, in perform_request
+    response = self.pool.urlopen(
+        method,
+    ...<4 lines>...
+        **kw,  # type: ignore[arg-type]
+    )
+  File "/usr/local/lib/python3.14/site-packages/urllib3/connectionpool.py", line 842, in urlopen
+    retries = retries.increment(
+        method, url, error=new_e, _pool=self, _stacktrace=sys.exc_info()[2]
+    )
+  File "/usr/local/lib/python3.14/site-packages/urllib3/util/retry.py", line 473, in increment
+    raise reraise(type(error), error, _stacktrace)
+          ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.14/site-packages/urllib3/util/util.py", line 39, in reraise
+    raise value
+  File "/usr/local/lib/python3.14/site-packages/urllib3/connectionpool.py", line 788, in urlopen
+    response = self._make_request(
+        conn,
+    ...<10 lines>...
+        **response_kw,
+    )
+  File "/usr/local/lib/python3.14/site-packages/urllib3/connectionpool.py", line 493, in _make_request
+    conn.request(
+    ~~~~~~~~~~~~^
+        method,
+        ^^^^^^^
+    ...<6 lines>...
+        enforce_content_length=enforce_content_length,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/usr/local/lib/python3.14/site-packages/urllib3/connection.py", line 500, in request
+    self.endheaders()
+    ~~~~~~~~~~~~~~~^^
+  File "/usr/local/lib/python3.14/http/client.py", line 1381, in endheaders
+    self._send_output(message_body, encode_chunked=encode_chunked)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.14/http/client.py", line 1141, in _send_output
+    self.send(msg)
+    ~~~~~~~~~^^^^^
+  File "/usr/local/lib/python3.14/http/client.py", line 1085, in send
+    self.connect()
+    ~~~~~~~~~~~~^^
+  File "/usr/local/lib/python3.14/site-packages/urllib3/connection.py", line 331, in connect
+    self.sock = self._new_conn()
+                ~~~~~~~~~~~~~~^^
+  File "/usr/local/lib/python3.14/site-packages/urllib3/connection.py", line 219, in _new_conn
+    raise NewConnectionError(
+        self, f"Failed to establish a new connection: {e}"
+    ) from e
+urllib3.exceptions.NewConnectionError: HTTPConnection(host='localhost', port=9200): Failed to establish a new connection: [Errno 111] Connection refused
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.14/site-packages/elastic_transport/_transport.py", line 375, in perform_request
+    resp = node.perform_request(
+        method,
+    ...<3 lines>...
+        request_timeout=request_timeout,
+    )
+  File "/usr/local/lib/python3.14/site-packages/elastic_transport/_node/_http_urllib3.py", line 202, in perform_request
+    raise err from e
+elastic_transport.ConnectionError: Connection error caused by: NewConnectionError(HTTPConnection(host='localhost', port=9200): Failed to establish a new connection: [Errno 111] Connection refused)
+{"timestamp": "2026-08-07 23:50:30,843", "level": "INFO", "logger": "elastic_transport.transport", "message": "POST http://localhost:9200/livros-logs/_doc [status:N/A duration:0.001s]"}
+{"timestamp": "2026-08-07 23:50:30,845", "level": "WARNING", "logger": "elastic_transport.node_pool", "message": "Node <Urllib3HttpNode(http://localhost:9200)> has failed for 4 times in a row, putting on 8 second timeout"}
+{"timestamp": "2026-08-07 23:50:30,849", "level": "ERROR", "logger": "main", "message": "Erro ao enviar log para Elasticsearch: Connection error caused by: ConnectionError(Connection error caused by: NewConnectionError(HTTPConnection(host='localhost', port=9200): Failed to establish a new connection: [Errno 111] Connection refused))"}
+{"timestamp": "2026-08-07 20:50:31,142", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:50:31,513", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:50:31,873", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:50:32,285", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:50:32,692", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:50:33,059", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:50:33,483", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:50:33,907", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:50:34,277", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:50:34,687", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:50:35,094", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:50:35,513", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:50:35,874", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:50:36,291", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:50:36,707", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:50:37,121", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:50:37,486", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:50:37,900", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:50:38,430", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:50:38,805", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:50:39,183", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:50:39,656", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:50:40,073", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:50:40,453", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:50:40,866", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:50:41,285", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:50:41,644", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:50:42,054", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:50:42,461", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:50:42,868", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:50:43,223", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:50:43,663", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:50:44,106", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:50:44,512", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:50:44,869", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:50:45,281", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:50:45,687", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:50:46,096", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:50:46,500", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:50:46,860", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:50:47,268", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:50:47,684", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:50:48,101", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:50:48,466", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:50:48,885", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:50:49,289", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:50:49,696", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:50:50,053", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:50:50,464", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:50:50,871", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:50:51,279", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:50:51,638", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:50:52,051", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:50:52,456", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:50:52,816", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:50:53,228", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:50:53,632", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:50:54,021", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:50:54,434", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:50:54,791", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:50:55,201", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:50:55,608", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:50:55,965", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:50:56,377", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:50:56,786", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:50:57,143", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:50:57,552", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:50:57,961", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:50:58,319", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:50:58,729", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:50:59,140", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:50:59,548", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:50:59,946", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:00,375", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:00,786", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:01,142", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:01,553", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:01,973", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:02,344", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:02,755", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:03,193", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:03,606", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:03,969", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:04,431", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:04,871", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:05,405", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:05,787", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:06,193", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:06,550", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:06,964", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:07,371", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:07,778", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:08,139", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:08,551", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:08,960", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:09,324", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:09,771", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:10,183", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:10,550", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:10,954", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:11,370", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:11,784", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:12,188", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:12,553", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:12,957", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:13,358", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:13,771", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:14,138", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:14,541", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:14,944", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:15,312", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:15,722", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:16,127", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:16,542", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:16,949", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:17,321", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:17,791", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:18,166", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:18,597", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:19,016", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:19,380", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:19,794", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:20,199", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:20,564", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:20,934", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:21,347", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:21,698", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:22,114", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:22,483", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:22,899", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:23,252", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:23,664", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:24,069", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:24,433", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:24,847", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:25,203", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:25,603", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:26,027", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:26,382", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:26,807", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:27,195", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:27,601", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:27,972", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:28,378", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:28,736", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:29,145", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:29,561", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:29,923", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:30,343", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:30,749", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:31,107", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:31,525", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:31,892", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:32,267", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:32,678", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:33,097", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:33,518", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:33,902", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:34,292", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:34,709", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:35,069", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:35,477", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:35,895", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:36,299", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:36,663", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:37,067", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:37,469", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:37,882", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:38,235", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:38,650", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:39,053", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:39,459", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:39,819", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:40,222", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:40,639", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:41,054", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:41,423", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:41,837", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:42,206", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:42,629", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:43,042", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:43,409", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:43,772", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:44,175", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:44,577", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:44,946", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:45,396", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:45,803", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:46,159", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:46,562", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:46,974", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:47,393", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:47,752", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:48,161", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:48,577", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:48,943", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:49,346", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:49,757", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:50,162", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:50,515", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:50,916", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:51,330", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:51,732", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:52,134", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:52,500", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:52,914", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:53,269", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:53,684", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:54,040", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:54,457", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:54,863", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:55,274", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:55,640", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:56,056", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:56,424", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:56,840", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:57,241", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:57,644", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:58,055", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:58,424", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:58,840", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:59,202", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:51:59,615", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:52:00,031", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:52:00,396", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:52:00,802", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:52:01,163", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:52:01,580", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:52:01,946", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:52:02,348", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:52:02,754", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:52:03,162", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:52:03,532", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:52:03,896", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:52:04,300", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:52:04,713", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:52:05,064", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:52:05,466", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:52:05,882", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:52:06,300", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:52:06,662", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:52:07,064", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:52:07,467", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:52:07,870", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:52:08,235", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:52:08,602", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:52:09,004", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:52:09,408", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:52:09,763", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:52:10,172", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:52:10,537", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:52:10,940", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:52:11,343", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:52:11,789", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:52:12,358", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:52:12,722", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:52:13,139", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:52:13,548", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:52:13,907", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:52:14,314", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:52:14,683", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:52:15,097", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:52:15,512", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:52:15,863", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:52:16,279", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:52:16,786", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:52:17,145", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:52:17,508", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:52:17,873", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 23:52:49,208", "level": "INFO", "logger": "elastic_transport.node_pool", "message": "Resurrected node <Urllib3HttpNode(http://localhost:9200)> (force=False)"}
+{"timestamp": "2026-08-07 23:52:49,212", "level": "INFO", "logger": "elastic_transport.transport", "message": "POST http://localhost:9200/livros-logs/_doc [status:N/A duration:0.002s]"}
+{"timestamp": "2026-08-07 23:52:49,213", "level": "WARNING", "logger": "elastic_transport.node_pool", "message": "Node <Urllib3HttpNode(http://localhost:9200)> has failed for 5 times in a row, putting on 16 second timeout"}
+{"timestamp": "2026-08-07 23:52:49,215", "level": "WARNING", "logger": "elastic_transport.transport", "message": "Retrying request after failure (attempt 0 of 3)"}
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.14/site-packages/urllib3/connection.py", line 204, in _new_conn
+    sock = connection.create_connection(
+        (self._dns_host, self.port),
+    ...<2 lines>...
+        socket_options=self.socket_options,
+    )
+  File "/usr/local/lib/python3.14/site-packages/urllib3/util/connection.py", line 85, in create_connection
+    raise err
+  File "/usr/local/lib/python3.14/site-packages/urllib3/util/connection.py", line 73, in create_connection
+    sock.connect(sa)
+    ~~~~~~~~~~~~^^^^
+ConnectionRefusedError: [Errno 111] Connection refused
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.14/site-packages/elastic_transport/_node/_http_urllib3.py", line 167, in perform_request
+    response = self.pool.urlopen(
+        method,
+    ...<4 lines>...
+        **kw,  # type: ignore[arg-type]
+    )
+  File "/usr/local/lib/python3.14/site-packages/urllib3/connectionpool.py", line 842, in urlopen
+    retries = retries.increment(
+        method, url, error=new_e, _pool=self, _stacktrace=sys.exc_info()[2]
+    )
+  File "/usr/local/lib/python3.14/site-packages/urllib3/util/retry.py", line 473, in increment
+    raise reraise(type(error), error, _stacktrace)
+          ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.14/site-packages/urllib3/util/util.py", line 39, in reraise
+    raise value
+  File "/usr/local/lib/python3.14/site-packages/urllib3/connectionpool.py", line 788, in urlopen
+    response = self._make_request(
+        conn,
+    ...<10 lines>...
+        **response_kw,
+    )
+  File "/usr/local/lib/python3.14/site-packages/urllib3/connectionpool.py", line 493, in _make_request
+    conn.request(
+    ~~~~~~~~~~~~^
+        method,
+        ^^^^^^^
+    ...<6 lines>...
+        enforce_content_length=enforce_content_length,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/usr/local/lib/python3.14/site-packages/urllib3/connection.py", line 500, in request
+    self.endheaders()
+    ~~~~~~~~~~~~~~~^^
+  File "/usr/local/lib/python3.14/http/client.py", line 1381, in endheaders
+    self._send_output(message_body, encode_chunked=encode_chunked)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.14/http/client.py", line 1141, in _send_output
+    self.send(msg)
+    ~~~~~~~~~^^^^^
+  File "/usr/local/lib/python3.14/http/client.py", line 1085, in send
+    self.connect()
+    ~~~~~~~~~~~~^^
+  File "/usr/local/lib/python3.14/site-packages/urllib3/connection.py", line 331, in connect
+    self.sock = self._new_conn()
+                ~~~~~~~~~~~~~~^^
+  File "/usr/local/lib/python3.14/site-packages/urllib3/connection.py", line 219, in _new_conn
+    raise NewConnectionError(
+        self, f"Failed to establish a new connection: {e}"
+    ) from e
+urllib3.exceptions.NewConnectionError: HTTPConnection(host='localhost', port=9200): Failed to establish a new connection: [Errno 111] Connection refused
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.14/site-packages/elastic_transport/_transport.py", line 375, in perform_request
+    resp = node.perform_request(
+        method,
+    ...<3 lines>...
+        request_timeout=request_timeout,
+    )
+  File "/usr/local/lib/python3.14/site-packages/elastic_transport/_node/_http_urllib3.py", line 202, in perform_request
+    raise err from e
+elastic_transport.ConnectionError: Connection error caused by: NewConnectionError(HTTPConnection(host='localhost', port=9200): Failed to establish a new connection: [Errno 111] Connection refused)
+{"timestamp": "2026-08-07 23:52:49,229", "level": "INFO", "logger": "elastic_transport.node_pool", "message": "Resurrected node <Urllib3HttpNode(http://localhost:9200)> (force=False)"}
+{"timestamp": "2026-08-07 23:52:49,235", "level": "INFO", "logger": "elastic_transport.transport", "message": "POST http://localhost:9200/livros-logs/_doc [status:N/A duration:0.001s]"}
+{"timestamp": "2026-08-07 23:52:49,236", "level": "WARNING", "logger": "elastic_transport.node_pool", "message": "Node <Urllib3HttpNode(http://localhost:9200)> has failed for 6 times in a row, putting on 30 second timeout"}
+{"timestamp": "2026-08-07 23:52:49,237", "level": "WARNING", "logger": "elastic_transport.transport", "message": "Retrying request after failure (attempt 1 of 3)"}
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.14/site-packages/urllib3/connection.py", line 204, in _new_conn
+    sock = connection.create_connection(
+        (self._dns_host, self.port),
+    ...<2 lines>...
+        socket_options=self.socket_options,
+    )
+  File "/usr/local/lib/python3.14/site-packages/urllib3/util/connection.py", line 85, in create_connection
+    raise err
+  File "/usr/local/lib/python3.14/site-packages/urllib3/util/connection.py", line 73, in create_connection
+    sock.connect(sa)
+    ~~~~~~~~~~~~^^^^
+ConnectionRefusedError: [Errno 111] Connection refused
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.14/site-packages/elastic_transport/_node/_http_urllib3.py", line 167, in perform_request
+    response = self.pool.urlopen(
+        method,
+    ...<4 lines>...
+        **kw,  # type: ignore[arg-type]
+    )
+  File "/usr/local/lib/python3.14/site-packages/urllib3/connectionpool.py", line 842, in urlopen
+    retries = retries.increment(
+        method, url, error=new_e, _pool=self, _stacktrace=sys.exc_info()[2]
+    )
+  File "/usr/local/lib/python3.14/site-packages/urllib3/util/retry.py", line 473, in increment
+    raise reraise(type(error), error, _stacktrace)
+          ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.14/site-packages/urllib3/util/util.py", line 39, in reraise
+    raise value
+  File "/usr/local/lib/python3.14/site-packages/urllib3/connectionpool.py", line 788, in urlopen
+    response = self._make_request(
+        conn,
+    ...<10 lines>...
+        **response_kw,
+    )
+  File "/usr/local/lib/python3.14/site-packages/urllib3/connectionpool.py", line 493, in _make_request
+    conn.request(
+    ~~~~~~~~~~~~^
+        method,
+        ^^^^^^^
+    ...<6 lines>...
+        enforce_content_length=enforce_content_length,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/usr/local/lib/python3.14/site-packages/urllib3/connection.py", line 500, in request
+    self.endheaders()
+    ~~~~~~~~~~~~~~~^^
+  File "/usr/local/lib/python3.14/http/client.py", line 1381, in endheaders
+    self._send_output(message_body, encode_chunked=encode_chunked)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.14/http/client.py", line 1141, in _send_output
+    self.send(msg)
+    ~~~~~~~~~^^^^^
+  File "/usr/local/lib/python3.14/http/client.py", line 1085, in send
+    self.connect()
+    ~~~~~~~~~~~~^^
+  File "/usr/local/lib/python3.14/site-packages/urllib3/connection.py", line 331, in connect
+    self.sock = self._new_conn()
+                ~~~~~~~~~~~~~~^^
+  File "/usr/local/lib/python3.14/site-packages/urllib3/connection.py", line 219, in _new_conn
+    raise NewConnectionError(
+        self, f"Failed to establish a new connection: {e}"
+    ) from e
+urllib3.exceptions.NewConnectionError: HTTPConnection(host='localhost', port=9200): Failed to establish a new connection: [Errno 111] Connection refused
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.14/site-packages/elastic_transport/_transport.py", line 375, in perform_request
+    resp = node.perform_request(
+        method,
+    ...<3 lines>...
+        request_timeout=request_timeout,
+    )
+  File "/usr/local/lib/python3.14/site-packages/elastic_transport/_node/_http_urllib3.py", line 202, in perform_request
+    raise err from e
+elastic_transport.ConnectionError: Connection error caused by: NewConnectionError(HTTPConnection(host='localhost', port=9200): Failed to establish a new connection: [Errno 111] Connection refused)
+{"timestamp": "2026-08-07 23:52:49,252", "level": "INFO", "logger": "elastic_transport.node_pool", "message": "Resurrected node <Urllib3HttpNode(http://localhost:9200)> (force=False)"}
+{"timestamp": "2026-08-07 23:52:49,256", "level": "INFO", "logger": "elastic_transport.transport", "message": "POST http://localhost:9200/livros-logs/_doc [status:N/A duration:0.001s]"}
+{"timestamp": "2026-08-07 23:52:49,258", "level": "WARNING", "logger": "elastic_transport.node_pool", "message": "Node <Urllib3HttpNode(http://localhost:9200)> has failed for 7 times in a row, putting on 30 second timeout"}
+{"timestamp": "2026-08-07 23:52:49,259", "level": "WARNING", "logger": "elastic_transport.transport", "message": "Retrying request after failure (attempt 2 of 3)"}
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.14/site-packages/urllib3/connection.py", line 204, in _new_conn
+    sock = connection.create_connection(
+        (self._dns_host, self.port),
+    ...<2 lines>...
+        socket_options=self.socket_options,
+    )
+  File "/usr/local/lib/python3.14/site-packages/urllib3/util/connection.py", line 85, in create_connection
+    raise err
+  File "/usr/local/lib/python3.14/site-packages/urllib3/util/connection.py", line 73, in create_connection
+    sock.connect(sa)
+    ~~~~~~~~~~~~^^^^
+ConnectionRefusedError: [Errno 111] Connection refused
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.14/site-packages/elastic_transport/_node/_http_urllib3.py", line 167, in perform_request
+    response = self.pool.urlopen(
+        method,
+    ...<4 lines>...
+        **kw,  # type: ignore[arg-type]
+    )
+  File "/usr/local/lib/python3.14/site-packages/urllib3/connectionpool.py", line 842, in urlopen
+    retries = retries.increment(
+        method, url, error=new_e, _pool=self, _stacktrace=sys.exc_info()[2]
+    )
+  File "/usr/local/lib/python3.14/site-packages/urllib3/util/retry.py", line 473, in increment
+    raise reraise(type(error), error, _stacktrace)
+          ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.14/site-packages/urllib3/util/util.py", line 39, in reraise
+    raise value
+  File "/usr/local/lib/python3.14/site-packages/urllib3/connectionpool.py", line 788, in urlopen
+    response = self._make_request(
+        conn,
+    ...<10 lines>...
+        **response_kw,
+    )
+  File "/usr/local/lib/python3.14/site-packages/urllib3/connectionpool.py", line 493, in _make_request
+    conn.request(
+    ~~~~~~~~~~~~^
+        method,
+        ^^^^^^^
+    ...<6 lines>...
+        enforce_content_length=enforce_content_length,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/usr/local/lib/python3.14/site-packages/urllib3/connection.py", line 500, in request
+    self.endheaders()
+    ~~~~~~~~~~~~~~~^^
+  File "/usr/local/lib/python3.14/http/client.py", line 1381, in endheaders
+    self._send_output(message_body, encode_chunked=encode_chunked)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.14/http/client.py", line 1141, in _send_output
+    self.send(msg)
+    ~~~~~~~~~^^^^^
+  File "/usr/local/lib/python3.14/http/client.py", line 1085, in send
+    self.connect()
+    ~~~~~~~~~~~~^^
+  File "/usr/local/lib/python3.14/site-packages/urllib3/connection.py", line 331, in connect
+    self.sock = self._new_conn()
+                ~~~~~~~~~~~~~~^^
+  File "/usr/local/lib/python3.14/site-packages/urllib3/connection.py", line 219, in _new_conn
+    raise NewConnectionError(
+        self, f"Failed to establish a new connection: {e}"
+    ) from e
+urllib3.exceptions.NewConnectionError: HTTPConnection(host='localhost', port=9200): Failed to establish a new connection: [Errno 111] Connection refused
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.14/site-packages/elastic_transport/_transport.py", line 375, in perform_request
+    resp = node.perform_request(
+        method,
+    ...<3 lines>...
+        request_timeout=request_timeout,
+    )
+  File "/usr/local/lib/python3.14/site-packages/elastic_transport/_node/_http_urllib3.py", line 202, in perform_request
+    raise err from e
+elastic_transport.ConnectionError: Connection error caused by: NewConnectionError(HTTPConnection(host='localhost', port=9200): Failed to establish a new connection: [Errno 111] Connection refused)
+{"timestamp": "2026-08-07 23:52:49,270", "level": "INFO", "logger": "elastic_transport.node_pool", "message": "Resurrected node <Urllib3HttpNode(http://localhost:9200)> (force=False)"}
+{"timestamp": "2026-08-07 23:52:49,273", "level": "INFO", "logger": "elastic_transport.transport", "message": "POST http://localhost:9200/livros-logs/_doc [status:N/A duration:0.001s]"}
+{"timestamp": "2026-08-07 23:52:49,274", "level": "WARNING", "logger": "elastic_transport.node_pool", "message": "Node <Urllib3HttpNode(http://localhost:9200)> has failed for 8 times in a row, putting on 30 second timeout"}
+{"timestamp": "2026-08-07 23:52:49,275", "level": "ERROR", "logger": "main", "message": "Erro ao enviar log para Elasticsearch: Connection error caused by: ConnectionError(Connection error caused by: NewConnectionError(HTTPConnection(host='localhost', port=9200): Failed to establish a new connection: [Errno 111] Connection refused))"}
+{"timestamp": "2026-08-07 20:52:49,632", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:52:49,983", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:52:50,348", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:52:50,716", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:52:51,070", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:52:51,430", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:52:51,811", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:52:52,175", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:52:53,096", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:52:53,468", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:52:53,827", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:52:54,179", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:52:54,645", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:52:55,015", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:52:55,423", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:52:55,778", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:52:56,192", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:52:56,614", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:52:57,127", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:52:57,492", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:52:57,909", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:52:58,319", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:52:58,688", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:52:59,101", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:52:59,511", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:52:59,878", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:00,288", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:00,691", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:01,055", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:01,459", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:01,872", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:02,284", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:02,642", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:03,059", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:03,411", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:03,816", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:04,230", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:04,637", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:04,988", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:05,424", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:05,801", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:06,208", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:06,620", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:06,983", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:07,387", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:07,753", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:08,155", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:08,571", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:08,936", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:09,341", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:09,750", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:10,156", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:10,571", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:10,923", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:11,377", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:11,734", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:12,154", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:12,530", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:13,021", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:13,430", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:13,797", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:14,212", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:14,617", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:14,978", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:15,397", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:15,765", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:16,134", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:16,547", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:16,949", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:17,365", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:17,777", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:18,182", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:18,537", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:18,954", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:19,367", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:19,775", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:20,136", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:20,538", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:20,904", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:21,326", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:21,690", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:22,104", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:22,520", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:22,875", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:23,288", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:23,689", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:24,106", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:24,523", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:24,890", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:25,295", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:25,655", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:26,111", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:26,476", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:26,879", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:27,297", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:27,713", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:28,079", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:28,490", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:28,897", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:29,804", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:30,165", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:30,530", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:30,896", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:31,249", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:31,667", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:32,081", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:32,437", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:32,858", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:33,219", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:33,620", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:34,086", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:34,451", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:34,868", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:35,287", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:35,653", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:36,071", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:36,440", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:36,845", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:37,258", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:37,671", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:38,024", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:38,458", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:38,824", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:39,230", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:39,642", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:40,012", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:40,419", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:40,826", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:41,302", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:41,657", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:42,079", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:42,447", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:42,865", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:43,232", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:43,650", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:44,013", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:44,423", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:44,831", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:45,244", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:45,648", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:46,012", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:46,416", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:46,772", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:47,184", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:47,538", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:47,949", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:48,371", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:48,762", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:49,252", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:49,619", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:50,068", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:50,536", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:50,887", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:51,300", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:51,701", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:52,055", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:52,471", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 20:53:52,825", "level": "INFO", "logger": "watchfiles.main", "message": "1 change detected"}
+{"timestamp": "2026-08-07 23:54:44,584", "level": "INFO", "logger": "elastic_transport.node_pool", "message": "Resurrected node <Urllib3HttpNode(http://localhost:9200)> (force=False)"}
+{"timestamp": "2026-08-07 23:54:44,587", "level": "INFO", "logger": "elastic_transport.transport", "message": "POST http://localhost:9200/livros-logs/_doc [status:N/A duration:0.001s]"}
+{"timestamp": "2026-08-07 23:54:44,588", "level": "WARNING", "logger": "elastic_transport.node_pool", "message": "Node <Urllib3HttpNode(http://localhost:9200)> has failed for 9 times in a row, putting on 30 second timeout"}
+{"timestamp": "2026-08-07 23:54:44,589", "level": "WARNING", "logger": "elastic_transport.transport", "message": "Retrying request after failure (attempt 0 of 3)"}
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.14/site-packages/urllib3/connection.py", line 204, in _new_conn
+    sock = connection.create_connection(
+        (self._dns_host, self.port),
+    ...<2 lines>...
+        socket_options=self.socket_options,
+    )
+  File "/usr/local/lib/python3.14/site-packages/urllib3/util/connection.py", line 85, in create_connection
+    raise err
+  File "/usr/local/lib/python3.14/site-packages/urllib3/util/connection.py", line 73, in create_connection
+    sock.connect(sa)
+    ~~~~~~~~~~~~^^^^
+ConnectionRefusedError: [Errno 111] Connection refused
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.14/site-packages/elastic_transport/_node/_http_urllib3.py", line 167, in perform_request
+    response = self.pool.urlopen(
+        method,
+    ...<4 lines>...
+        **kw,  # type: ignore[arg-type]
+    )
+  File "/usr/local/lib/python3.14/site-packages/urllib3/connectionpool.py", line 842, in urlopen
+    retries = retries.increment(
+        method, url, error=new_e, _pool=self, _stacktrace=sys.exc_info()[2]
+    )
+  File "/usr/local/lib/python3.14/site-packages/urllib3/util/retry.py", line 473, in increment
+    raise reraise(type(error), error, _stacktrace)
+          ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.14/site-packages/urllib3/util/util.py", line 39, in reraise
+    raise value
+  File "/usr/local/lib/python3.14/site-packages/urllib3/connectionpool.py", line 788, in urlopen
+    response = self._make_request(
+        conn,
+    ...<10 lines>...
+        **response_kw,
+    )
+  File "/usr/local/lib/python3.14/site-packages/urllib3/connectionpool.py", line 493, in _make_request
+    conn.request(
+    ~~~~~~~~~~~~^
+        method,
+        ^^^^^^^
+    ...<6 lines>...
+        enforce_content_length=enforce_content_length,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/usr/local/lib/python3.14/site-packages/urllib3/connection.py", line 500, in request
+    self.endheaders()
+    ~~~~~~~~~~~~~~~^^
+  File "/usr/local/lib/python3.14/http/client.py", line 1381, in endheaders
+    self._send_output(message_body, encode_chunked=encode_chunked)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.14/http/client.py", line 1141, in _send_output
+    self.send(msg)
+    ~~~~~~~~~^^^^^
+  File "/usr/local/lib/python3.14/http/client.py", line 1085, in send
+    self.connect()
+    ~~~~~~~~~~~~^^
+  File "/usr/local/lib/python3.14/site-packages/urllib3/connection.py", line 331, in connect
+    self.sock = self._new_conn()
+                ~~~~~~~~~~~~~~^^
+  File "/usr/local/lib/python3.14/site-packages/urllib3/connection.py", line 219, in _new_conn
+    raise NewConnectionError(
+        self, f"Failed to establish a new connection: {e}"
+    ) from e
+urllib3.exceptions.NewConnectionError: HTTPConnection(host='localhost', port=9200): Failed to establish a new connection: [Errno 111] Connection refused
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.14/site-packages/elastic_transport/_transport.py", line 375, in perform_request
+    resp = node.perform_request(
+        method,
+    ...<3 lines>...
+        request_timeout=request_timeout,
+    )
+  File "/usr/local/lib/python3.14/site-packages/elastic_transport/_node/_http_urllib3.py", line 202, in perform_request
+    raise err from e
+elastic_transport.ConnectionError: Connection error caused by: NewConnectionError(HTTPConnection(host='localhost', port=9200): Failed to establish a new connection: [Errno 111] Connection refused)
+{"timestamp": "2026-08-07 23:54:44,599", "level": "INFO", "logger": "elastic_transport.node_pool", "message": "Resurrected node <Urllib3HttpNode(http://localhost:9200)> (force=False)"}
+{"timestamp": "2026-08-07 23:54:44,601", "level": "INFO", "logger": "elastic_transport.transport", "message": "POST http://localhost:9200/livros-logs/_doc [status:N/A duration:0.001s]"}
+{"timestamp": "2026-08-07 23:54:44,602", "level": "WARNING", "logger": "elastic_transport.node_pool", "message": "Node <Urllib3HttpNode(http://localhost:9200)> has failed for 10 times in a row, putting on 30 second timeout"}
+{"timestamp": "2026-08-07 23:54:44,607", "level": "WARNING", "logger": "elastic_transport.transport", "message": "Retrying request after failure (attempt 1 of 3)"}
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.14/site-packages/urllib3/connection.py", line 204, in _new_conn
+    sock = connection.create_connection(
+        (self._dns_host, self.port),
+    ...<2 lines>...
+        socket_options=self.socket_options,
+    )
+  File "/usr/local/lib/python3.14/site-packages/urllib3/util/connection.py", line 85, in create_connection
+    raise err
+  File "/usr/local/lib/python3.14/site-packages/urllib3/util/connection.py", line 73, in create_connection
+    sock.connect(sa)
+    ~~~~~~~~~~~~^^^^
+ConnectionRefusedError: [Errno 111] Connection refused
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.14/site-packages/elastic_transport/_node/_http_urllib3.py", line 167, in perform_request
+    response = self.pool.urlopen(
+        method,
+    ...<4 lines>...
+        **kw,  # type: ignore[arg-type]
+    )
+  File "/usr/local/lib/python3.14/site-packages/urllib3/connectionpool.py", line 842, in urlopen
+    retries = retries.increment(
+        method, url, error=new_e, _pool=self, _stacktrace=sys.exc_info()[2]
+    )
+  File "/usr/local/lib/python3.14/site-packages/urllib3/util/retry.py", line 473, in increment
+    raise reraise(type(error), error, _stacktrace)
+          ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.14/site-packages/urllib3/util/util.py", line 39, in reraise
+    raise value
+  File "/usr/local/lib/python3.14/site-packages/urllib3/connectionpool.py", line 788, in urlopen
+    response = self._make_request(
+        conn,
+    ...<10 lines>...
+        **response_kw,
+    )
+  File "/usr/local/lib/python3.14/site-packages/urllib3/connectionpool.py", line 493, in _make_request
+    conn.request(
+    ~~~~~~~~~~~~^
+        method,
+        ^^^^^^^
+    ...<6 lines>...
+        enforce_content_length=enforce_content_length,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/usr/local/lib/python3.14/site-packages/urllib3/connection.py", line 500, in request
+    self.endheaders()
+    ~~~~~~~~~~~~~~~^^
+  File "/usr/local/lib/python3.14/http/client.py", line 1381, in endheaders
+    self._send_output(message_body, encode_chunked=encode_chunked)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.14/http/client.py", line 1141, in _send_output
+    self.send(msg)
+    ~~~~~~~~~^^^^^
+  File "/usr/local/lib/python3.14/http/client.py", line 1085, in send
+    self.connect()
+    ~~~~~~~~~~~~^^
+  File "/usr/local/lib/python3.14/site-packages/urllib3/connection.py", line 331, in connect
+    self.sock = self._new_conn()
+                ~~~~~~~~~~~~~~^^
+  File "/usr/local/lib/python3.14/site-packages/urllib3/connection.py", line 219, in _new_conn
+    raise NewConnectionError(
+        self, f"Failed to establish a new connection: {e}"
+    ) from e
+urllib3.exceptions.NewConnectionError: HTTPConnection(host='localhost', port=9200): Failed to establish a new connection: [Errno 111] Connection refused
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.14/site-packages/elastic_transport/_transport.py", line 375, in perform_request
+    resp = node.perform_request(
+        method,
+    ...<3 lines>...
+        request_timeout=request_timeout,
+    )
+  File "/usr/local/lib/python3.14/site-packages/elastic_transport/_node/_http_urllib3.py", line 202, in perform_request
+    raise err from e
+elastic_transport.ConnectionError: Connection error caused by: NewConnectionError(HTTPConnection(host='localhost', port=9200): Failed to establish a new connection: [Errno 111] Connection refused)
+{"timestamp": "2026-08-07 23:54:44,616", "level": "INFO", "logger": "elastic_transport.node_pool", "message": "Resurrected node <Urllib3HttpNode(http://localhost:9200)> (force=False)"}
+{"timestamp": "2026-08-07 23:54:44,618", "level": "INFO", "logger": "elastic_transport.transport", "message": "POST http://localhost:9200/livros-logs/_doc [status:N/A duration:0.001s]"}
+{"timestamp": "2026-08-07 23:54:44,619", "level": "WARNING", "logger": "elastic_transport.node_pool", "message": "Node <Urllib3HttpNode(http://localhost:9200)> has failed for 11 times in a row, putting on 30 second timeout"}
+{"timestamp": "2026-08-07 23:54:44,620", "level": "WARNING", "logger": "elastic_transport.transport", "message": "Retrying request after failure (attempt 2 of 3)"}
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.14/site-packages/urllib3/connection.py", line 204, in _new_conn
+    sock = connection.create_connection(
+        (self._dns_host, self.port),
+    ...<2 lines>...
+        socket_options=self.socket_options,
+    )
+  File "/usr/local/lib/python3.14/site-packages/urllib3/util/connection.py", line 85, in create_connection
+    raise err
+  File "/usr/local/lib/python3.14/site-packages/urllib3/util/connection.py", line 73, in create_connection
+    sock.connect(sa)
+    ~~~~~~~~~~~~^^^^
+ConnectionRefusedError: [Errno 111] Connection refused
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.14/site-packages/elastic_transport/_node/_http_urllib3.py", line 167, in perform_request
+    response = self.pool.urlopen(
+        method,
+    ...<4 lines>...
+        **kw,  # type: ignore[arg-type]
+    )
+  File "/usr/local/lib/python3.14/site-packages/urllib3/connectionpool.py", line 842, in urlopen
+    retries = retries.increment(
+        method, url, error=new_e, _pool=self, _stacktrace=sys.exc_info()[2]
+    )
+  File "/usr/local/lib/python3.14/site-packages/urllib3/util/retry.py", line 473, in increment
+    raise reraise(type(error), error, _stacktrace)
+          ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.14/site-packages/urllib3/util/util.py", line 39, in reraise
+    raise value
+  File "/usr/local/lib/python3.14/site-packages/urllib3/connectionpool.py", line 788, in urlopen
+    response = self._make_request(
+        conn,
+    ...<10 lines>...
+        **response_kw,
+    )
+  File "/usr/local/lib/python3.14/site-packages/urllib3/connectionpool.py", line 493, in _make_request
+    conn.request(
+    ~~~~~~~~~~~~^
+        method,
+        ^^^^^^^
+    ...<6 lines>...
+        enforce_content_length=enforce_content_length,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/usr/local/lib/python3.14/site-packages/urllib3/connection.py", line 500, in request
+    self.endheaders()
+    ~~~~~~~~~~~~~~~^^
+  File "/usr/local/lib/python3.14/http/client.py", line 1381, in endheaders
+    self._send_output(message_body, encode_chunked=encode_chunked)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.14/http/client.py", line 1141, in _send_output
+    self.send(msg)
+    ~~~~~~~~~^^^^^
+  File "/usr/local/lib/python3.14/http/client.py", line 1085, in send
+    self.connect()
+    ~~~~~~~~~~~~^^
+  File "/usr/local/lib/python3.14/site-packages/urllib3/connection.py", line 331, in connect
+    self.sock = self._new_conn()
+                ~~~~~~~~~~~~~~^^
+  File "/usr/local/lib/python3.14/site-packages/urllib3/connection.py", line 219, in _new_conn
+    raise NewConnectionError(
+        self, f"Failed to establish a new connection: {e}"
+    ) from e
+urllib3.exceptions.NewConnectionError: HTTPConnection(host='localhost', port=9200): Failed to establish a new connection: [Errno 111] Connection refused
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.14/site-packages/elastic_transport/_transport.py", line 375, in perform_request
+    resp = node.perform_request(
+        method,
+    ...<3 lines>...
+        request_timeout=request_timeout,
+    )
+  File "/usr/local/lib/python3.14/site-packages/elastic_transport/_node/_http_urllib3.py", line 202, in perform_request
+    raise err from e
+elastic_transport.ConnectionError: Connection error caused by: NewConnectionError(HTTPConnection(host='localhost', port=9200): Failed to establish a new connection: [Errno 111] Connection refused)
+{"timestamp": "2026-08-07 23:54:44,626", "level": "INFO", "logger": "elastic_transport.node_pool", "message": "Resurrected node <Urllib3HttpNode(http://localhost:9200)> (force=False)"}
+{"timestamp": "2026-08-07 23:54:44,628", "level": "INFO", "logger": "elastic_transport.transport", "message": "POST http://localhost:9200/livros-logs/_doc [status:N/A duration:0.001s]"}
+{"timestamp": "2026-08-07 23:54:44,629", "level": "WARNING", "logger": "elastic_transport.node_pool", "message": "Node <Urllib3HttpNode(http://localhost:9200)> has failed for 12 times in a row, putting on 30 second timeout"}
+{"timestamp": "2026-08-07 23:54:44,630", "level": "ERROR", "logger": "main", "message": "Erro ao enviar log para Elasticsearch: Connection error caused by: ConnectionError(Connection error caused by: NewConnectionError(HTTPConnection(host='localhost', port=9200): Failed to establish a new connection: [Errno 111] Connection refused))"}
