@@ -1,3 +1,6 @@
+Atualizei o README com uma visão mais completa da stack e das tecnologias do projeto.
+
+```markdown
 # API de Livros
 
 API REST para gerenciamento de livros com FastAPI, SQLAlchemy, SQLite, Celery, Redis e Kafka.
@@ -12,18 +15,28 @@ O projeto implementa:
 - worker Celery usando Redis
 - broker Kafka com Zookeeper e interface Kafka UI
 
-## Stack
+## Tecnologias presentes
+
+Esta aplicação utiliza uma stack completa de backend com foco em API REST, banco de dados relacional, fila de tarefas, mensageria e containerização:
 
 - Python `3.14`
-- FastAPI
-- SQLAlchemy `2.x`
-- Pydantic
-- Celery
-- Redis
-- Kafka
-- Zookeeper
-- SQLite
-- Docker / Podman
+- FastAPI para criação da API REST
+- Uvicorn como servidor ASGI
+- SQLAlchemy `2.x` como ORM
+- SQLite como banco de dados local
+- Pydantic para validação de dados
+- HTTP Basic Auth para autenticação das rotas de livros
+- `asyncio` para execução de chamadas assíncronas
+- Celery para processamento assíncrono de tarefas
+- Redis como broker/resultado para Celery
+- Kafka como broker de eventos
+- Zookeeper como coordenador do Kafka
+- Kafka UI para visualização e inspeção do cluster Kafka
+- Docker / Podman para containerização
+- Docker Compose / Podman Compose para orquestração dos serviços
+- pytest para execução de testes
+- Arquivos `.env` para configuração por variáveis de ambiente
+- Swagger / ReDoc / OpenAPI gerados automaticamente pelo FastAPI
 
 ## Arquivos principais
 
