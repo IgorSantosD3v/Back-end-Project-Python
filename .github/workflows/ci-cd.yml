@@ -115,7 +115,7 @@ jobs:
     name: Deploy no Kubernetes
     needs: build-and-push
     if: github.event_name != 'pull_request'
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     env:
       NAMESPACE: default
 
@@ -126,30 +126,6 @@ jobs:
       - name: Normalizar nome do owner (lowercase)
         id: owner
         run: echo "name=$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')" >> "$GITHUB_OUTPUT"
-
-      - name: Instalar kubectl
-        uses: azure/setup-kubectl@v4
-        with:
-          version: v1.30.0
-
-      - name: Configurar kubeconfig
-        shell: bash
-        run: |
-          mkdir -p ~/.kube
-          python - <<'PY'
-          import base64
-          import os
-          import pathlib
-          raw = os.environ.get("KUBE_CONFIG_B64", "")
-          if not raw:
-              raise SystemExit("KUBE_CONFIG_B64 está vazio")
-          decoded = base64.b64decode(raw.encode("utf-8")).decode("utf-8")
-          pathlib.Path.home().joinpath(".kube", "config").write_text(decoded, encoding="utf-8")
-          PY
-          chmod 600 ~/.kube/config
-          kubectl version --client
-        env:
-          KUBE_CONFIG_B64: ${{ secrets.KUBE_CONFIG }}
 
       - name: Substituir imagem no manifesto
         run: |
