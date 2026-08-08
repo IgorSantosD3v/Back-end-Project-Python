@@ -1,22 +1,54 @@
-# 📚 API de Livros
+<div align="center">
 
-API REST para gerenciamento de livros, construída com **FastAPI**, **SQLAlchemy**, **SQLite**, **Celery**, **Redis** e **Kafka**.
+# 📚 Livros API
 
-O projeto foi pensado como um estudo prático de arquitetura backend, unindo CRUD, autenticação, processamento assíncrono e mensageria em um único ambiente containerizado — com pipeline de CI/CD completa até o deploy em Kubernetes.
+**API REST para gerenciamento de livros**, construída com FastAPI e um stack completo de observabilidade e mensageria.
+
+[![Python](https://img.shields.io/badge/Python-3.14-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+[![Docker](https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=white)](https://www.docker.com/)
+[![Kubernetes](https://img.shields.io/badge/Kubernetes-326CE5?logo=kubernetes&logoColor=white)](https://kubernetes.io/)
+[![CI/CD](https://img.shields.io/badge/CI%2FCD-GitHub%20Actions-2088FF?logo=githubactions&logoColor=white)](https://github.com/features/actions)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](#-licença)
+
+</div>
+
+O projeto une CRUD, autenticação, processamento assíncrono, mensageria e logging estruturado em um ambiente containerizado, com pipeline de CI/CD e deploy em Kubernetes.
+
+---
+
+## 📑 Sumário
+
+- [Funcionalidades](#-funcionalidades)
+- [Stack utilizada](#️-stack-utilizada)
+- [Arquitetura](#-arquitetura)
+- [Estrutura do projeto](#-estrutura-do-projeto)
+- [Variáveis de ambiente](#️-variáveis-de-ambiente)
+- [Executando localmente](#-executando-localmente)
+- [Executando com containers](#-executando-com-containers)
+- [CI/CD (GitHub Actions)](#-cicd-github-actions)
+- [Deploy no Kubernetes](#️-deploy-no-kubernetes)
+- [Endpoints](#-endpoints)
+- [Exemplos de uso](#-exemplos-de-uso)
+- [Documentação automática](#-documentação-automática)
+- [Troubleshooting](#-troubleshooting)
+- [Licença](#-licença)
 
 ---
 
 ## ✨ Funcionalidades
 
-- CRUD completo de livros
+- CRUD completo de livros com persistência SQLite
 - Autenticação HTTP Basic nas rotas de livros
-- Paginação na listagem
-- Exemplo de concorrência assíncrona com `asyncio`
-- Worker Celery usando Redis como broker/backend
-- Broker Kafka com Zookeeper e interface Kafka UI
-- Execução local via `venv` + `requirements.txt`
-- Orquestração de containers com Docker Compose / Podman Compose
-- Pipeline de CI/CD com GitHub Actions: testes → build/push da imagem → deploy em Kubernetes
+- Paginação na listagem de livros
+- Demonstração de concorrência assíncrona com `asyncio`
+- Processamento assíncrono com Celery + Redis
+- Publicação de eventos no Kafka via `kafka-python`
+- Envio de logs estruturados para Elasticsearch
+- Visualização de logs em Kibana
+- Pipeline de ingestão de logs com Logstash
+- Execução local com Poetry e Docker Compose
+- Pipeline GitHub Actions para testes, build e deploy em Kubernetes
 
 ---
 
@@ -24,20 +56,48 @@ O projeto foi pensado como um estudo prático de arquitetura backend, unindo CRU
 
 | Categoria | Tecnologias |
 |---|---|
-| Linguagem | Python `3.14` |
-| API | FastAPI, Uvicorn (ASGI) |
-| Dados | SQLAlchemy `2.x`, SQLite, Pydantic |
+| Linguagem | Python 3.14 |
+| API | FastAPI, Uvicorn |
+| Banco de dados | SQLAlchemy 2.x, SQLite |
+| Validação | Pydantic |
 | Autenticação | HTTP Basic Auth |
 | Assincronismo | `asyncio` |
-| Tarefas em background | Celery + Redis |
+| Tasks | Celery, Redis |
 | Mensageria | Kafka, Zookeeper, Kafka UI |
-| Containerização | Docker / Podman, Docker Compose / Podman Compose |
-| Orquestração | Kubernetes (minikube) |
-| CI/CD | GitHub Actions (runner self-hosted) |
-| Registro de imagens | GitHub Container Registry (GHCR) |
-| Testes | pytest |
-| Configuração | Arquivos `.env` |
-| Documentação | Swagger, ReDoc, OpenAPI (gerados automaticamente pelo FastAPI) |
+| Observabilidade | Elasticsearch, Kibana, Logstash |
+| Containerização | Docker, Docker Compose |
+| Orquestração | Kubernetes (Minikube) |
+| CI/CD | GitHub Actions |
+| Dependências | Poetry |
+| Testes | pytest, pytest-cov |
+
+---
+
+## 🏗️ Arquitetura
+
+```
+                 ┌──────────────┐
+   Cliente ───▶  │   FastAPI    │ ───▶ SQLite (dados dos livros)
+                 │  (main.py)   │
+                 └──────┬───────┘
+                         │
+             ┌───────────┼────────────┐
+             ▼                        ▼
+      ┌─────────────┐         ┌──────────────┐
+      │ Celery+Redis│         │ Kafka Producer│
+      │ (tasks.py)  │         │(kafka_producer)│
+      └─────────────┘         └──────┬───────┘
+                                       ▼
+                               ┌──────────────┐
+                               │    Kafka     │
+                               └──────┬───────┘
+                                       ▼
+                    ┌────────────────────────────────┐
+                    │ Logstash ▶ Elasticsearch ▶ Kibana│
+                    └────────────────────────────────┘
+```
+
+Todos os serviços rodam localmente via Docker Compose e, em produção, são orquestrados no Kubernetes (Minikube).
 
 ---
 
@@ -50,15 +110,19 @@ O projeto foi pensado como um estudo prático de arquitetura backend, unindo CRU
 ├── docker-compose.yml
 ├── Dockerfile
 ├── main.py
-├── requirements.txt
 ├── celery_app.py
 ├── tasks.py
 ├── kafka_producer.py
 ├── deployment.yaml
 ├── service.yaml
-├── .github
-│   └── workflows
+├── logging_config.yaml
+├── logstash/
+│   └── logstash.conf
+├── .github/
+│   └── workflows/
 │       └── ci-cd.yml
+├── pyproject.toml
+├── poetry.lock
 └── README.md
 ```
 
@@ -66,17 +130,16 @@ O projeto foi pensado como um estudo prático de arquitetura backend, unindo CRU
 
 | Arquivo | Responsabilidade |
 |---|---|
-| `main.py` | Aplicação FastAPI: modelos, rotas, autenticação e banco |
+| `main.py` | Aplicação FastAPI: modelos, rotas, autenticação, banco, Elasticsearch e Kafka |
 | `tasks.py` | Tarefas Celery (`somar`, `fatorial`) |
-| `celery_app.py` | Configuração do Celery com broker Redis |
-| `kafka_producer.py` | Produtor simples para eventos Kafka |
-| `Dockerfile` | Definição da imagem do container da API |
-| `docker-compose.yml` | Orquestra `app`, `redis`, `celery`, `zookeeper`, `kafka` e `kafka-ui` |
-| `requirements.txt` | Dependências Python do projeto |
-| `.env` | Variáveis de ambiente da aplicação |
-| `deployment.yaml` | Manifesto Kubernetes do Deployment da API |
-| `service.yaml` | Manifesto Kubernetes do Service que expõe a API |
-| `.github/workflows/ci-cd.yml` | Pipeline de CI/CD (testes, build/push, deploy) |
+| `celery_app.py` | Configuração do Celery com Redis broker/backend |
+| `kafka_producer.py` | Produtor Kafka para enviar eventos de livro |
+| `logging_config.yaml` | Configuração de logging local e em arquivo |
+| `docker-compose.yml` | Orquestra os serviços do projeto |
+| `Dockerfile` | Imagem da aplicação usando Poetry |
+| `deployment.yaml` | Manifesto Kubernetes do Deployment |
+| `service.yaml` | Manifesto Kubernetes do Service |
+| `.github/workflows/ci-cd.yml` | Pipeline de CI/CD |
 
 ---
 
@@ -87,7 +150,14 @@ O projeto foi pensado como um estudo prático de arquitetura backend, unindo CRU
 | `DATABASE_URL` | `sqlite:///./livros.db` | String de conexão do banco |
 | `MEU_USUARIO` | `admin` | Usuário para HTTP Basic Auth |
 | `MINHA_SENHA` | `admin` | Senha para HTTP Basic Auth |
-| `KAFKA_SERVER` | `kafka:9092` | Endereço do broker Kafka |
+| `REDIS_HOST` | `localhost` | Host Redis |
+| `REDIS_PORT` | `6379` | Porta Redis |
+| `KAFKA_SERVER` | `kafka:9092` | Broker Kafka para o app |
+| `ELASTICSEARCH_URL` | `http://localhost:9200` | URL do Elasticsearch |
+| `ELASTICSEARCH_INDEX` | `livros-logs` | Índice de logs no Elasticsearch |
+| `LOG_FILE_PATH` | `undefined` | Caminho do log de arquivo quando usado no container |
+
+> ⚠️ **Segurança:** as credenciais padrão (`admin`/`admin`) servem apenas para ambiente local. Nunca utilize esses valores em produção — defina `MEU_USUARIO` e `MINHA_SENHA` via secrets do orquestrador (Kubernetes Secret, GitHub Actions Secret, etc).
 
 Exemplo de `.env`:
 
@@ -96,6 +166,10 @@ MEU_USUARIO=admin
 MINHA_SENHA=admin
 DATABASE_URL=sqlite:///./livros.db
 KAFKA_SERVER=kafka:9092
+ELASTICSEARCH_URL=http://elasticsearch:9200
+ELASTICSEARCH_INDEX=livros-logs
+REDIS_HOST=redis
+REDIS_PORT=6379
 PYTHONUNBUFFERED=1
 ```
 
@@ -103,7 +177,13 @@ PYTHONUNBUFFERED=1
 
 ## 🚀 Executando localmente
 
-### 1. Criar e ativar o ambiente virtual
+### 1. Pré-requisitos
+
+- Python 3.14+
+- [Poetry](https://python-poetry.org/)
+- Redis, Kafka e Elasticsearch acessíveis (localmente ou via `docker compose up -d redis kafka elasticsearch`)
+
+### 2. Criar e ativar o ambiente virtual
 
 **PowerShell (Windows):**
 
@@ -111,7 +191,8 @@ PYTHONUNBUFFERED=1
 python -m venv venv
 .\venv\Scripts\Activate.ps1
 python -m pip install --upgrade pip
-python -m pip install -r requirements.txt
+python -m pip install poetry
+poetry install --no-root
 python -m uvicorn main:app --reload --host 0.0.0.0 --port 8000
 ```
 
@@ -121,16 +202,17 @@ python -m uvicorn main:app --reload --host 0.0.0.0 --port 8000
 python -m venv venv
 source venv/bin/activate
 python -m pip install --upgrade pip
-python -m pip install -r requirements.txt
+python -m pip install poetry
+poetry install --no-root
 python -m uvicorn main:app --reload --host 0.0.0.0 --port 8000
 ```
 
 A API ficará disponível em `http://127.0.0.1:8000`.
 
-### 2. Rodar os testes
+### 3. Rodar os testes
 
 ```bash
-pytest
+pytest --cov
 ```
 
 ---
@@ -171,25 +253,27 @@ podman ps
 | Serviço | Endereço |
 |---|---|
 | API Swagger | `http://127.0.0.1:8000/docs` |
+| Kibana | `http://127.0.0.1:5601` |
 | Kafka UI | `http://127.0.0.1:8080` |
 | Redis | `127.0.0.1:6379` |
+| Elasticsearch | `http://127.0.0.1:9200` |
 | Kafka broker (externo) | `127.0.0.1:9094` |
 
-> ⚠️ **Observação:** internamente o serviço Kafka usa `kafka:9092`, mas o `docker-compose` mapeia a porta externa para `9094`.
+> ⚠️ **Observação:** internamente o Kafka usa `kafka:9092`, mas o `docker-compose` expõe a porta externa `9094`.
 
 ---
 
 ## 🔁 CI/CD (GitHub Actions)
 
-A pipeline (`.github/workflows/ci-cd.yml`) roda em todo `push`/`pull_request` para `main`/`master`, ou manualmente via `workflow_dispatch`, e é composta por três jobs sequenciais:
+A pipeline (`.github/workflows/ci-cd.yml`) roda em todo `push`/`pull_request` para `main`/`master`, ou manualmente via `workflow_dispatch`, e é composta por três jobs:
 
 | Job | Runner | O que faz |
 |---|---|---|
-| **Testes e validação** | `ubuntu-latest` | Instala dependências com Poetry, valida o `pyproject.toml` e roda `pytest` com relatório de cobertura (subindo um serviço Redis para os testes) |
-| **Build e publicação da imagem Docker** | `ubuntu-latest` | Builda a imagem com Docker Buildx e publica no GHCR com as tags `latest` e `<sha do commit>` |
-| **Deploy no Kubernetes** | `self-hosted` | Substitui a imagem no `deployment.yaml`, aplica os manifests (`deployment.yaml` + `service.yaml`) no cluster e aguarda o rollout |
+| **Testes e validação** | `ubuntu-latest` | Instala dependências com Poetry, valida `pyproject.toml` e roda `pytest` com cobertura |
+| **Build e publicação da imagem Docker** | `ubuntu-latest` | Builda e publica a imagem no GHCR |
+| **Deploy no Kubernetes** | `self-hosted` | Atualiza o manifesto e aplica os manifests no cluster |
 
-Os dois primeiros jobs rodam em runners hospedados pelo GitHub. O job de deploy roda em um **runner self-hosted**, pois o cluster Kubernetes (minikube) usado neste projeto é local.
+O job de deploy usa um runner self-hosted conectado ao cluster local (necessário porque o Minikube só é acessível na máquina onde está rodando).
 
 ### Imagem publicada
 
@@ -204,14 +288,14 @@ ghcr.io/<owner>/backendproject:<sha>
 
 ## ☸️ Deploy no Kubernetes
 
-O deploy é feito em um cluster **minikube** local, através do runner self-hosted configurado na máquina.
+O deploy é feito em um cluster local usando **Minikube**.
 
 ### Pré-requisitos na máquina do runner
 
 - Docker instalado e em execução
-- [minikube](https://minikube.sigs.k8s.io/docs/start/) instalado
-- `kubectl` configurado apontando para o cluster do minikube
-- Runner do GitHub Actions registrado no repositório com a label `self-hosted`
+- [Minikube](https://minikube.sigs.k8s.io/docs/start/) instalado
+- `kubectl` configurado para o cluster Minikube
+- Runner GitHub Actions com label `self-hosted`
 
 ### Subindo o cluster manualmente (se necessário)
 
@@ -221,7 +305,7 @@ minikube status
 kubectl get nodes
 ```
 
-### Aplicando os manifests manualmente (fora da pipeline)
+### Aplicando os manifests manualmente
 
 ```bash
 kubectl apply -f deployment.yaml -n default
@@ -237,8 +321,6 @@ kubectl get svc -n default
 kubectl logs -l app=livros-api -n default
 ```
 
-> 💡 **Dica:** se o job "Deploy no Kubernetes" falhar com `connection refused`, o cluster minikube provavelmente está parado. A pipeline já inclui um step que verifica e reinicia o minikube automaticamente antes de aplicar os manifests.
-
 ---
 
 ## 📡 Endpoints
@@ -249,6 +331,14 @@ kubectl logs -l app=livros-api -n default
 |---|---|---|
 | GET | `/` | Health check da API |
 | GET | `/chamadas-externas` | Simula 3 chamadas assíncronas concorrentes |
+
+### Tarefas em segundo plano (Celery)
+
+| Método | Rota | Descrição |
+|---|---|---|
+| POST | `/calcular/soma` | Enfileira cálculo de soma |
+| POST | `/calcular/fatorial` | Enfileira cálculo de fatorial |
+| GET | `/tarefas/recentes` | Lista IDs e status das últimas tarefas |
 
 ### Com HTTP Basic Auth
 
@@ -306,3 +396,41 @@ Com a API em execução, acesse:
 - Swagger UI: `http://127.0.0.1:8000/docs`
 - ReDoc: `http://127.0.0.1:8000/redoc`
 - OpenAPI JSON: `http://127.0.0.1:8000/openapi.json`
+
+---
+
+## 🩺 Troubleshooting
+
+| Sintoma | Causa provável | Solução |
+|---|---|---|
+| `connection refused` no deploy | Minikube não está rodando | `minikube start --driver=docker` |
+| API sobe mas `/livros` retorna 401 | Credenciais erradas ou `.env` não carregado | Confirme `MEU_USUARIO`/`MINHA_SENHA` e se o `.env` está sendo lido |
+| Kafka producer não conecta | Uso de `localhost:9092` fora do container | Use `kafka:9092` dentro da rede Docker, ou `127.0.0.1:9094` externamente |
+| Logs não aparecem no Kibana | Logstash não processou o índice | Verifique `logstash/logstash.conf` e se o Elasticsearch está saudável (`/_cluster/health`) |
+| Runner self-hosted não enxerga o cluster | Minikube roda em contexto isolado (ex: WSL) | Garanta que o runner esteja na mesma máquina/contexto onde o Minikube foi iniciado |
+
+---
+
+## 🤝 Contribuindo
+
+Contribuições são bem-vindas. Para propor uma mudança:
+
+1. Faça um fork do repositório
+2. Crie uma branch (`git checkout -b feature/minha-feature`)
+3. Commit suas alterações (`git commit -m 'feat: minha feature'`)
+4. Push para a branch (`git push origin feature/minha-feature`)
+5. Abra um Pull Request
+
+---
+
+## 📄 Licença
+
+Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
+
+---
+
+<div align="center">
+
+Desenvolvido por **Igor Santos** — [GitHub](https://github.com/IgorSantosD3v) · [LinkedIn](https://linkedin.com/in/igor-santos-7b993b357)
+
+</div>
