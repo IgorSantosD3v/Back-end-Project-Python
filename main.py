@@ -10,6 +10,7 @@ from datetime import datetime
 import redis
 import yaml
 from celery.result import AsyncResult
+from dotenv import load_dotenv
 from elasticsearch import Elasticsearch
 from fastapi import Depends, FastAPI, HTTPException
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
@@ -30,6 +31,8 @@ from tasks import fatorial, somar
 # --------------------------------------------------------------------------
 # Configuração
 # --------------------------------------------------------------------------
+
+load_dotenv()
 
 DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./livros.db")
 ELASTICSEARCH_URL = os.getenv("ELASTICSEARCH_URL", "http://localhost:9200")
