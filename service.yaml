@@ -3,7 +3,7 @@ kind: Service
 metadata:
   name: livros-api-service
 spec:
-  type: LoadBalancer
+  type: ClusterIP
   selector:
     app: livros-api
   ports:
