@@ -163,5 +163,27 @@ jobs:
           kubectl apply -f service.yaml -n ${{ env.NAMESPACE }}
 
       - name: Aguardar rollout
+        run: kubectl rollout status deployment/livros-api --timeout=180s -n ${{ env.NAMESPACE }}
+
+      - name: Debug - Status dos pods (se rollout falhar)
+        if: failure()
         run: |
-          kubectl rollout status deployment/livros-api --timeout=180s -n ${{ env.NAMESPACE }}
+          echo "===== PODS ====="
+          kubectl get pods -n ${{ env.NAMESPACE }} -o wide
+          echo "===== DESCRIBE DOS PODS DO DEPLOYMENT ====="
+          for pod in $(kubectl get pods -n ${{ env.NAMESPACE }} -l app=livros-api -o jsonpath='{.items[*].metadata.name}'); do
+            echo "--- Describe: $pod ---"
+            kubectl describe pod "$pod" -n ${{ env.NAMESPACE }}
+          done
+          echo "===== LOGS DOS PODS (containers atuais) ====="
+          for pod in $(kubectl get pods -n ${{ env.NAMESPACE }} -l app=livros-api -o jsonpath='{.items[*].metadata.name}'); do
+            echo "--- Logs: $pod ---"
+            kubectl logs "$pod" -n ${{ env.NAMESPACE }} --all-containers=true --tail=100 || true
+          done
+          echo "===== LOGS DOS PODS (containers que crasharam - previous) ====="
+          for pod in $(kubectl get pods -n ${{ env.NAMESPACE }} -l app=livros-api -o jsonpath='{.items[*].metadata.name}'); do
+            echo "--- Previous logs: $pod ---"
+            kubectl logs "$pod" -n ${{ env.NAMESPACE }} --all-containers=true --previous --tail=100 || true
+          done
+          echo "===== EVENTOS DO NAMESPACE ====="
+          kubectl get events -n ${{ env.NAMESPACE }} --sort-by='.lastTimestamp' | tail -30
