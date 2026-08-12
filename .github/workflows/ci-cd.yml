@@ -187,3 +187,5 @@ jobs:
           done
           echo "===== EVENTOS DO NAMESPACE ====="
           kubectl get events -n ${{ env.NAMESPACE }} --sort-by='.lastTimestamp' | tail -30
+
+          #OK
