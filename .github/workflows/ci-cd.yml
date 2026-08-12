@@ -163,7 +163,7 @@ jobs:
           kubectl apply -f service.yaml -n ${{ env.NAMESPACE }}
 
       - name: Aguardar rollout
-        run: kubectl rollout status deployment/livros-api --timeout=180s -n ${{ env.NAMESPACE }}
+        run: kubectl rollout status deployment/livros-api --timeout=400s -n ${{ env.NAMESPACE }}
 
       - name: Debug - Status dos pods (se rollout falhar)
         if: failure()
