@@ -69,7 +69,7 @@ jobs:
           poetry run pytest -q --cov=. --cov-report=xml
 
       - name: Upload do relatório de cobertura
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: coverage-report
